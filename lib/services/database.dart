@@ -10,10 +10,13 @@ class DatabaseService {
   final CollectionReference collectionReference = FirebaseFirestore.instance.collection('users_collection'); //brew - name of collection
 
   //we need to call this function everytime a new user signs up to link their data to their unique id (uid)
-  Future updateUserData(String name, String username) async {
+  Future updateUserData(String email, String password, String name, String username) async {
 
     //updating the fields name, sugars and strength in the document corresponding to the user's unique id under the collection 'brew'
     return await collectionReference.doc(uid).set({
+      'uid': uid,
+      'email': email,
+      'password': password,
       'name': name,
       'username': username,
     });
@@ -25,6 +28,8 @@ class DatabaseService {
       uid: uid,
       name: snapshot.get('name'),
       username: snapshot.get('username'),
+      email: snapshot.get('email'),
+      password: snapshot.get('password'),
     );
   }
 

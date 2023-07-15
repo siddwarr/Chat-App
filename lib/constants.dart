@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 const textInputDecoration = InputDecoration(
-  hintText: 'Email',
   filled: true,
   fillColor: Colors.white,
   enabledBorder: OutlineInputBorder( //when the text field is not focused

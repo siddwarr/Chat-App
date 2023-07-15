@@ -19,13 +19,15 @@ class _RegisterState extends State<Register> {
   final CollectionReference collectionReference = FirebaseFirestore.instance.collection('users_collection');
 
   //creating an instance of the AuthService class that we had created in auth.dart file
-  final AuthService _auth = AuthService();
+  final AuthService _authService = AuthService();
 
   String email = '';
   String password = '';
   String name = '';
   String username = '';
   String error = '';
+  bool showPassword = false;
+  IconData passwordIcon = Icons.remove_red_eye;
 
   final _formKey = GlobalKey<FormState>(); //to validate our form (username and password)
 
@@ -90,7 +92,18 @@ class _RegisterState extends State<Register> {
                 ),
                 //for password
                 TextFormField(
-                  decoration: textInputDecoration.copyWith(hintText: 'Password'),
+                  decoration: textInputDecoration.copyWith(hintText: 'Password', suffixIcon: TextButton.icon(icon: Icon(passwordIcon), onPressed: () {
+                    //here, we change the state of obscureText
+                    setState(() {
+                      showPassword = !showPassword;
+                      if (passwordIcon == Icons.remove_red_eye) {
+                        passwordIcon = Icons.remove_red_eye_outlined;
+                      }
+                      else {
+                        passwordIcon = Icons.remove_red_eye;
+                      }
+                    });
+                  }, label: const Text(''))),
                   validator: (val) => val!.length < 6 ? 'Password should contain at least 6 characters' : null, //we are validating the password by making sure it is at least 6 characters long
                   obscureText: true,
                   onChanged: (val) {
@@ -140,14 +153,14 @@ class _RegisterState extends State<Register> {
                   ),
                   onPressed: () async {
                     //here is where we need to interact with Firebase and sign the user up with the entered email and password
-                    if (_formKey.currentState!.validate()) { //for the user to sign in successfully, validators from both TextFormFields should return 'null'
+                    if (_formKey.currentState!.validate()) { //for the user to register successfully, validators from both TextFormFields should return 'null'
                       //if everything is valid, check for validity of the username and proceed to register
                       final valid = await validateUsername(username);
                       if (!valid) {
                         setState(() {
                           loading = true;
                         });
-                        dynamic result = await _auth.registerWithEmailPassword(email, password, name, username);
+                        dynamic result = await _authService.registerWithEmailPassword(email, password, name, username);
                         if (result == null) {
                           setState(() {
                             error = 'Could not register with those credentials';

@@ -18,11 +18,13 @@ class SignIn extends StatefulWidget {
 class _SignInState extends State<SignIn> {
 
   //creating an instance of the AuthService class that we had created in auth.dart file
-  final AuthService _auth = AuthService();
+  final AuthService _authService = AuthService();
 
   String email = '';
   String password = '';
   String error = '';
+  bool showPassword = false;
+  IconData passwordIcon = Icons.remove_red_eye;
 
   final _formKey = GlobalKey<FormState>(); //to validate our form (username and password)
 
@@ -79,7 +81,18 @@ class _SignInState extends State<SignIn> {
               ),
               //for password
               TextFormField(
-                decoration: textInputDecoration.copyWith(hintText: 'Password'),
+                decoration: textInputDecoration.copyWith(hintText: 'Password', suffixIcon: TextButton.icon(icon: Icon(passwordIcon), onPressed: () {
+                  //here, we change the state of obscureText
+                  setState(() {
+                    showPassword = !showPassword;
+                    if (passwordIcon == Icons.remove_red_eye) {
+                      passwordIcon = Icons.remove_red_eye_outlined;
+                    }
+                    else {
+                      passwordIcon = Icons.remove_red_eye;
+                    }
+                  });
+                }, label: const Text(''))),
                 validator: (val) => val!.length < 6 ? 'Password should contain at least 6 characters' : null, //we are validating the password by making sure it is at least 6 characters long
                 obscureText: true,
                 onChanged: (val) {
@@ -105,7 +118,7 @@ class _SignInState extends State<SignIn> {
                     setState(() {
                       loading = true;
                     });
-                    dynamic result = await _auth.signInWithEmailPassword(email, password);
+                    dynamic result = await _authService.signInWithEmailPassword(email, password);
                     if (result == null) {
                       setState(() {
                         error = 'Could not sign-in with those credentials';
