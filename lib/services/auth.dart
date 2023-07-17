@@ -2,8 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:chat_app/models/custom_user.dart';
 import 'package:chat_app/services/database.dart';
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 class AuthService {
   //creating an instance of the FirebaseAuth class (which we imported)
@@ -13,20 +11,6 @@ class AuthService {
   //this function will return an object of our custom class - CustomUser by extracting only the 'uid' property from the 'User' object
   UserUID? _func1(User user) {
     return UserUID(uid: user.uid);
-  }
-
-  Future<String> getUsername(User user) async {
-    DocumentSnapshot documentSnapshot = await DatabaseService(uid: user.uid).collectionReference.doc(user.uid).get();
-    print('getUsername:');
-    print(documentSnapshot.get('username').toString());
-    return documentSnapshot.get('username').toString();
-  }
-
-  Future<String> getName(User user) async {
-    DocumentSnapshot documentSnapshot = await DatabaseService(uid: user.uid).collectionReference.doc(user.uid).get();
-    print('getName:');
-    print(documentSnapshot.get('name').toString());
-    return documentSnapshot.get('name').toString();
   }
 
   getData(User user) async {
@@ -66,7 +50,10 @@ class AuthService {
       User? user = result.user; //getting the user credentials
 
       //as soon as the user registers, we create a new document against their uid containing their name and username
-      await DatabaseService(uid: user!.uid).updateUserData(name, username);
+      await DatabaseService(uid: user!.uid).updateUserData(email, password, name, username);
+
+      //creating an empty chat list for the newly registered user
+      await DatabaseService(uid: user.uid).createChatList([]);
 
       return _func1(user); //mapping it to an object of CustomUser and returning it
     }

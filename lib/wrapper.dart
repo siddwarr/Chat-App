@@ -1,4 +1,5 @@
-import 'package:chat_app/screens/home.dart';
+import 'package:chat_app/bottom_navigation_screens/bottom_navigation_bar.dart';
+import 'package:chat_app/bottom_navigation_screens/home.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'authenticate.dart';
@@ -22,7 +23,7 @@ class _WrapperState extends State<Wrapper> {
       return const Authenticate();
     }
     else {
-      return const Home();
+      return BottomNavigation();
     }
   }
 }
