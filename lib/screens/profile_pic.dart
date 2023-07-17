@@ -11,8 +11,9 @@ import 'package:firebase_storage/firebase_storage.dart';
 
 
 class ProfilePic extends StatefulWidget {
-  const ProfilePic({super.key});
+  final File? image;
 
+  const ProfilePic({super.key, this.image});
   @override
   _ProfilePicState createState() => _ProfilePicState();
 }
@@ -20,6 +21,12 @@ class ProfilePic extends StatefulWidget {
 class _ProfilePicState extends State<ProfilePic> {
   File? _image;
   final picker = ImagePicker();
+
+  @override
+  void initState() {
+    super.initState();
+    _image = widget.image;
+  }
 
   Future<void> saveAndNavigate() async {
     await uploadImage();

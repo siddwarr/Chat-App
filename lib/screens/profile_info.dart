@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:chat_app/screens/profile_pic.dart';
 import 'package:flutter/material.dart';
 
 class ProfileInfoScreen extends StatelessWidget {
@@ -21,11 +22,39 @@ class ProfileInfoScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Center(
-              child: CircleAvatar(
-                backgroundImage: image != null ? FileImage(image!) : null,
-                radius: 60.0,
-              ),
+            Stack(
+              children: [
+                Center(
+                  child: CircleAvatar(
+                    backgroundImage: image != null
+                        ? FileImage(image!)
+                        : const AssetImage('assets/avatar.jpg') as ImageProvider,
+                    radius: 60.0,
+                  ),
+                ),
+                Positioned(
+                  bottom: 0,
+                  right: 100,
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ProfilePic(image: image,),
+                        ),
+                      );
+                    },
+                    child: const CircleAvatar(
+                      backgroundColor: Colors.amber,
+                      radius: 16.0,
+                      child: Icon(
+                        Icons.camera_alt,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
             const Divider(
               height: 50.0,
@@ -106,3 +135,4 @@ class ProfileInfoScreen extends StatelessWidget {
     );
   }
 }
+
