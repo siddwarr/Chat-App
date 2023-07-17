@@ -10,24 +10,24 @@ import 'package:firebase_storage/firebase_storage.dart';
 
 
 
-class Profile extends StatefulWidget {
-  const Profile({super.key});
+class ProfilePic extends StatefulWidget {
+  const ProfilePic({super.key});
 
   @override
-  _ProfileState createState() => _ProfileState();
+  _ProfilePicState createState() => _ProfilePicState();
 }
 
-class _ProfileState extends State<Profile> {
+class _ProfilePicState extends State<ProfilePic> {
   File? _image;
   final picker = ImagePicker();
 
   Future<void> saveAndNavigate() async {
     await uploadImage();
 
-    // Navigate to the profile information screen
+    // Navigate to the ProfilePic information screen
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => const ProfileInfoScreen()),
+      MaterialPageRoute(builder: (context) => ProfileInfoScreen(_image)),
     );
   }
 
@@ -62,10 +62,13 @@ class _ProfileState extends State<Profile> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Profile',
+      title: 'ProfilePic',
       home: Scaffold(
-        appBar: AppBar(
-          title: const Text('Profile'),
+        backgroundColor: Colors.blueGrey[900],
+        appBar:AppBar(
+          title: const Text('Profile Picture',style: TextStyle(color: Colors.amber),),
+          centerTitle: true,
+          backgroundColor: Colors.blueGrey[800],
         ),
         body: Center(
           child: Column(
@@ -74,16 +77,24 @@ class _ProfileState extends State<Profile> {
               CircleAvatar(
                 radius: 80,
                 backgroundColor: Colors.grey,
-                backgroundImage: _image != null ? FileImage(_image!) : null,
+                backgroundImage: _image != null
+                    ? FileImage(_image!)
+                    : const AssetImage('assets/avatar.jpg') as ImageProvider,
               ),
               const SizedBox(height: 20),
               ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blueGrey[800],
+                ),
                 onPressed: getImage,
-                child: const Text('Select Image'),
+                child: const Text('Select Image',style: TextStyle(color: Colors.amber),),
               ),
               ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blueGrey[800],
+                ),
                 onPressed: saveAndNavigate,
-                child: const Text('Save'),
+                child: const Text('Save',style: TextStyle(color: Colors.amber),),
               ),
             ],
           ),
