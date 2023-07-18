@@ -60,7 +60,6 @@ class _RegisterState extends State<Register> {
               },
               icon: const Icon(Icons.person, color: Colors.white),
               label: const Text('Sign In', style: TextStyle(color: Colors.white)),
-<<<<<<< HEAD
             ),
           ],
         ),
@@ -158,110 +157,6 @@ class _RegisterState extends State<Register> {
                         //if everything is valid, check for validity of the username and proceed to register
                         final valid = await validateUsername(username);
                         if (!valid) {
-=======
-          ),
-        ],
-      ),
-      body: Container(
-        padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 50.0),
-        child: Form(
-          key: _formKey, //associating _formKey with our Form widget
-          child: SingleChildScrollView(
-            physics: const NeverScrollableScrollPhysics(),
-            child: Column(
-              children: [
-                const SizedBox(
-                  height: 20.0,
-                ),
-                //for username/email-id
-                TextFormField(
-                  //val represents whatever remains in the form field at a particular time
-                  //this function will run whenever the user changes the contents of the form field (by entering new character or entering backspace)
-                  validator: (val) => val!.isEmpty ? 'Enter a valid email' : null, //we are validating the email by making sure it is not empty
-                  decoration: textInputDecoration.copyWith(hintText: 'Email'),
-                  onChanged: (val) {
-                    setState(() {
-                      //updating the 'email'
-                      email = val;
-                    });
-                  },
-                ),
-                const SizedBox(
-                  height: 20.0,
-                ),
-                //for password
-                TextFormField(
-                  decoration: textInputDecoration.copyWith(hintText: 'Password', suffixIcon: TextButton.icon(icon: Icon(passwordIcon), onPressed: () {
-                    //here, we change the state of obscureText
-                    setState(() {
-                      showPassword = !showPassword;
-                      if (passwordIcon == Icons.remove_red_eye) {
-                        passwordIcon = Icons.remove_red_eye_outlined;
-                      }
-                      else {
-                        passwordIcon = Icons.remove_red_eye;
-                      }
-                    });
-                  }, label: const Text(''))),
-                  validator: (val) => val!.length < 6 ? 'Password should contain at least 6 characters' : null, //we are validating the password by making sure it is at least 6 characters long
-                  obscureText: true,
-                  onChanged: (val) {
-                    setState(() {
-                      //updating the 'password'
-                      password = val;
-                    });
-                  },
-                ),
-                const SizedBox(
-                  height: 20.0,
-                ),
-                //for name
-                TextFormField(
-                  decoration: textInputDecoration.copyWith(hintText: 'Name'),
-                  validator: (val) => val!.isEmpty ? 'Enter a valid name' : null,
-                  onChanged: (val) {
-                    setState(() {
-                      //updating the 'name'
-                      name = val;
-                    });
-                  },
-                ),
-                const SizedBox(
-                  height: 20.0,
-                ),
-                //for username
-                TextFormField(
-                  decoration: textInputDecoration.copyWith(hintText: 'Username'),
-                  validator: (val) => val!.isEmpty ? 'Enter a valid username' : null,
-                  onChanged: (val) {
-                    setState(() {
-                      //updating the 'username'
-                      username = val;
-                    });
-                  },
-                ),
-                const SizedBox(
-                  height: 10.0,
-                ),
-                ElevatedButton(
-                  child: const Text(
-                    'Register',
-                    style: TextStyle(
-                      color: Colors.white,
-                    ),
-                  ),
-                  onPressed: () async {
-                    //here is where we need to interact with Firebase and sign the user up with the entered email and password
-                    if (_formKey.currentState!.validate()) { //for the user to register successfully, validators from both TextFormFields should return 'null'
-                      //if everything is valid, check for validity of the username and proceed to register
-                      final valid = await validateUsername(username);
-                      if (!valid) {
-                        setState(() {
-                          loading = true;
-                        });
-                        dynamic result = await _authService.registerWithEmailPassword(email, password, name, username);
-                        if (result == null) {
->>>>>>> upstream/main
                           setState(() {
                             loading = true;
                           });
