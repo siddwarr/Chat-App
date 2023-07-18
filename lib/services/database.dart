@@ -8,9 +8,13 @@ class DatabaseService {
   //collection reference - for storing basic user details
   final CollectionReference collectionReference = FirebaseFirestore.instance.collection('users_collection');
 
+<<<<<<< HEAD
   // collection reference - for storing basic user details
   final CollectionReference collectionReference1 = FirebaseFirestore.instance.collection('chat_list_collection');
 
+=======
+  //we need to call this function everytime a new user signs up to link their data to their unique id (uid)
+>>>>>>> upstream/main
   Future updateUserData(String email, String password, String name, String username) async {
 
     //updating the fields name, sugars and strength in the document corresponding to the user's unique id under the collection 'brew'

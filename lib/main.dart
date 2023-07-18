@@ -1,11 +1,18 @@
+<<<<<<< HEAD
 import 'package:chat_app/bottom_navigation_screens/home.dart';
 import 'package:chat_app/bottom_navigation_screens/profile_page.dart';
 import 'package:chat_app/bottom_navigation_screens/home.dart';
+=======
+import 'package:chat_app/screens/home.dart';
+import 'package:chat_app/screens/profile_page.dart';
+>>>>>>> upstream/main
 import 'package:chat_app/services/auth.dart';
 import 'package:chat_app/wrapper.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'models/custom_user.dart';
+
 import 'models/custom_user.dart';
 
 Future<void> main() async {
@@ -33,6 +40,11 @@ class MyApp extends StatelessWidget {
         initialRoute: '/',
         routes: {
           '/': (context) => const Wrapper(), //represents the first widget to be built when the app is first opened (when initialRoute not mentioned)
+<<<<<<< HEAD
+=======
+          '/profile': (context) => const Profile(),
+          '/home': (context) => const Home(),
+>>>>>>> upstream/main
         },
       ),
     );

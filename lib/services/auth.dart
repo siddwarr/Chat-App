@@ -51,9 +51,12 @@ class AuthService {
 
       //as soon as the user registers, we create a new document against their uid containing their name and username
       await DatabaseService(uid: user!.uid).updateUserData(email, password, name, username);
+<<<<<<< HEAD
 
       //creating an empty chat list for the newly registered user
       await DatabaseService(uid: user.uid).createChatList([]);
+=======
+>>>>>>> upstream/main
 
       return _func1(user); //mapping it to an object of CustomUser and returning it
     }
