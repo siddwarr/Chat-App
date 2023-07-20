@@ -1,6 +1,3 @@
-import 'package:chat_app/bottom_navigation_screens/home.dart';
-import 'package:chat_app/bottom_navigation_screens/profile_page.dart';
-import 'package:chat_app/bottom_navigation_screens/home.dart';
 import 'package:chat_app/services/auth.dart';
 import 'package:chat_app/wrapper.dart';
 import 'package:firebase_core/firebase_core.dart';

@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:chat_app/models/custom_user.dart';
 import 'package:chat_app/screens/loading.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -5,10 +6,14 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../constants.dart';
+import 'update_profile_pic.dart';
 import '../services/auth.dart';
 import '../services/database.dart';
 
 class Profile extends StatefulWidget {
+
+  final File? image;
+  const Profile(this.image, {Key? key}) : super(key: key);
 
   @override
   State<Profile> createState() => _ProfileState();
@@ -37,6 +42,19 @@ class _ProfileState extends State<Profile> {
   Widget build(BuildContext context) {
 
     final userData = Provider.of<CustomUser?>(context);
+
+    void _showBottomSheet() {
+      showModalBottomSheet(context: context, builder: (context) {
+        return Wrap(
+          children: [
+            Container(
+              padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 20.0),
+              child: const UpdateProfilePic(),
+            ),
+          ]
+        );
+      });
+    }
 
     //username validation (checking if username currently entered by user coincides with any other username
     Future<bool> validateUsername(String username) async {
@@ -73,21 +91,44 @@ class _ProfileState extends State<Profile> {
               physics: const NeverScrollableScrollPhysics(),
               child: Column(
                 children: [
-                  Column(
+                  Stack(
                     children: [
-                      const CircleAvatar(
-                        radius: 35.0,
-                        child: Icon(Icons.person),
+                      Center(
+                        child: CircleAvatar(
+                          backgroundImage: widget.image != null
+                              ? FileImage(widget.image!)
+                              : const AssetImage('assets/avatar.png') as ImageProvider,
+                          radius: 50.0,
+                        ),
                       ),
-                      TextButton(
-                        onPressed: () {
-
-                        },
-                        child: const Text('Update Profile Picture'),
-                      )
+                      Positioned(
+                        bottom: 0,
+                        right: 100,
+                        child: GestureDetector(
+                          onTap: () {
+                            return _showBottomSheet();
+                            // Navigator.push(
+                            //   context,
+                            //   MaterialPageRoute(
+                            //     builder: (context) => ProfilePic(image: widget.image),
+                            //   ),
+                            // );
+                          },
+                          child: const CircleAvatar(
+                            backgroundColor: Colors.amber,
+                            radius: 16.0,
+                            child: Icon(
+                              Icons.camera_alt,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
                     ],
                   ),
-                  //Text(userData!.name),
+                  const SizedBox(
+                    height: 20.0,
+                  ),
                   //for name
                   TextFormField(
                     initialValue: userData.name,
@@ -193,7 +234,7 @@ class _ProfileState extends State<Profile> {
                     ),
                   ),
                   const SizedBox(
-                    height: 20.0,
+                    height: 8.0,
                   ),
                   //logout button
                   SizedBox(

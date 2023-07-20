@@ -1,6 +1,7 @@
 import 'package:chat_app/bottom_navigation_screens/search_tile.dart';
 import 'package:chat_app/screens/loading.dart';
 import 'package:chat_app/services/database.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/custom_user.dart';
@@ -18,8 +19,6 @@ class _HomeState extends State<Home> {
 
     final userData = Provider.of<CustomUser?>(context);
 
-    final userChatList = Provider.of<List<CustomUser>>(context);
-
     if (userData == null) {
       return const Loading();
     }
@@ -30,27 +29,41 @@ class _HomeState extends State<Home> {
 
           final userDataList = snapshot.data;
 
-          return Scaffold(
-            appBar: AppBar(
-              title: const Text('Home'),
-              actions: [
-                IconButton(
-                  onPressed: () {
-                    showSearch(
-                      context: context,
-                      delegate: CustomSearchDelegate(userDataList: userDataList, userChatList: userChatList),
-                    );
-                  },
-                  icon: const Icon(Icons.search),
-                )
-              ],
-            ),
-            body: ListView.builder(
-              itemCount: userChatList.length,
-              itemBuilder: (context, index) {
-                return ChatTile(userData1: userData, userData2: userChatList[index]);
+          return StreamBuilder<List<dynamic>>(
+            stream: DatabaseService(uid: userData.uid).userChatListStream,
+            builder: (context, snapshot) {
+
+              if (snapshot.hasData) {
+                final userChatList = snapshot.data;
+
+                return Scaffold(
+                  appBar: AppBar(
+                    title: const Text('Home'),
+                    actions: [
+                      IconButton(
+                        onPressed: () {
+                          showSearch(
+                            context: context,
+                            delegate: CustomSearchDelegate(userDataList: userDataList, userChatList: userChatList!, userData: userData),
+                          );
+                        },
+                        icon: const Icon(Icons.search),
+                      )
+                    ],
+                  ),
+                  //body: Text('length = ${userChatList.length}'),
+                  body: ListView.builder(
+                      itemCount: userChatList?.length,
+                      itemBuilder: (context, index) {
+                        return ChatTile(userData1: userData, userData2: userChatList![index]);
+                      }
+                  ),
+                );
               }
-            ),
+              else {
+                return const Loading();
+              }
+            }
           );
         }
       );
@@ -62,9 +75,11 @@ class CustomSearchDelegate extends SearchDelegate {
 
   List<CustomUser>? userDataList;
 
-  List<CustomUser> userChatList;
+  List<dynamic> userChatList;
 
-  CustomSearchDelegate({this.userDataList, required this.userChatList});
+  CustomUser? userData;
+
+  CustomSearchDelegate({this.userDataList, required this.userChatList, required this.userData});
 
   @override
   List<Widget>? buildActions(BuildContext context) {
@@ -101,7 +116,7 @@ class CustomSearchDelegate extends SearchDelegate {
     return ListView.builder(
       itemCount: matchQuery.length,
       itemBuilder: (context, index) {
-        return SearchTile(userData: matchQuery[index], userChatList: userChatList);
+        return SearchTile(userData: matchQuery[index], userChatList: userChatList, currentUserData: userData!);
       }
     );
   }
@@ -118,7 +133,7 @@ class CustomSearchDelegate extends SearchDelegate {
     return ListView.builder(
       itemCount: matchQuery.length,
       itemBuilder: (context, index) {
-        return SearchTile(userData: matchQuery[index], userChatList: userChatList);
+        return SearchTile(userData: matchQuery[index], userChatList: userChatList, currentUserData: userData!);
       }
     );
   }

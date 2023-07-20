@@ -53,7 +53,7 @@ class AuthService {
       await DatabaseService(uid: user!.uid).updateUserData(email, password, name, username);
 
       //creating an empty chat list for the newly registered user
-      await DatabaseService(uid: user.uid).createChatList([]);
+      await DatabaseService(uid: user.uid).createChatList([] as List<Map<String, String>>);
 
       return _func1(user); //mapping it to an object of CustomUser and returning it
     }

@@ -23,6 +23,7 @@ class _WrapperState extends State<Wrapper> {
       return const Authenticate();
     }
     else {
+      print('UID OF USER: ${userUIDData.uid}');
       return BottomNavigation();
     }
   }

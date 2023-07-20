@@ -1,3 +1,4 @@
+import 'dart:core';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:chat_app/models/custom_user.dart';
 
@@ -8,7 +9,7 @@ class DatabaseService {
   //collection reference - for storing basic user details
   final CollectionReference collectionReference = FirebaseFirestore.instance.collection('users_collection');
 
-  // collection reference - for storing basic user details
+  // collection reference - for storing chat list of a user
   final CollectionReference collectionReference1 = FirebaseFirestore.instance.collection('chat_list_collection');
 
   Future updateUserData(String email, String password, String name, String username) async {
@@ -23,22 +24,24 @@ class DatabaseService {
     });
   }
 
-  Future createChatList(List<CustomUser> chatList) async {
+  Future createChatList(List<dynamic> chatList) async {
     return await collectionReference1.doc(uid).set({
       'list': chatList,
     });
   }
 
-  Future addUserToChatList(List<CustomUser> chatList, CustomUser newUser) async {
-    chatList.add(newUser);
+  Future addUserToChatList(List<dynamic> chatList, CustomUser newUser) async {
+    Map<String, String> temp = {};
+    temp = newUser.toMap();
+    List<String> uidList = [];
+    for (dynamic map in chatList) {
+      uidList.add(map['uid']);
+    }
+    if (!uidList.contains(newUser.uid) && newUser.uid != uid) {
+      chatList.add(temp);
+    }
     return await collectionReference1.doc(uid).set({
       'list': chatList,
-    });
-  }
-
-  Future deleteUserFromChatList(List<CustomUser> chatList, CustomUser newUser) async {
-    return await collectionReference1.doc(uid).set({
-      'list': chatList.remove(newUser),
     });
   }
 
@@ -79,11 +82,11 @@ class DatabaseService {
         .map(_userDataListFromSnapshot);
   }
 
-  List<CustomUser> _userChatListFromSnapshot(DocumentSnapshot snapshot) {
-    return snapshot.get('list');
+  List<dynamic> _userChatListFromSnapshot(DocumentSnapshot snapshot) {
+    return snapshot['list'];
   }
 
-  Stream<List<CustomUser>> get userChatListStream {
+  Stream<List<dynamic>> get userChatListStream {
     return collectionReference1.doc(uid).snapshots()
         .map(_userChatListFromSnapshot);
   }

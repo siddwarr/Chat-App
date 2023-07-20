@@ -6,8 +6,9 @@ import 'package:provider/provider.dart';
 class SearchTile extends StatelessWidget {
   
   final CustomUser userData;
-  final List<CustomUser> userChatList;
-  SearchTile({super.key, required this.userData, required this.userChatList});
+  final CustomUser currentUserData;
+  final List<dynamic> userChatList;
+  SearchTile({super.key, required this.userData, required this.userChatList, required this.currentUserData});
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +26,8 @@ class SearchTile extends StatelessWidget {
           subtitle: Text(userData.name),
           onTap: () async {
             //add that user to current user's chat list
-            await DatabaseService(uid: userData.uid).addUserToChatList(userChatList, userData);
+            await DatabaseService(uid: currentUserData.uid).addUserToChatList(userChatList, userData);
+            Navigator.pop(context);
           },
         ),
       ),
