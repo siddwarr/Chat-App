@@ -20,9 +20,9 @@ class _BottomNavigationState extends State<BottomNavigation> {
   @override
   Widget build(BuildContext context) {
 
-    final tabs = [Home(), SettingsScreen(), const Profile(null)];
-
     final userUIDData = Provider.of<UserUID?>(context);
+
+    final tabs = [Home(), SettingsScreen(), Profile()];
 
     return StreamProvider<CustomUser?>.value(
       value: DatabaseService(uid: userUIDData!.uid).userDataStream,

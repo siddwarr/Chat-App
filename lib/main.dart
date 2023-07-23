@@ -3,6 +3,7 @@ import 'package:chat_app/wrapper.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'bottom_navigation_screens/choose_avatar.dart';
 import 'models/custom_user.dart';
 
 Future<void> main() async {
@@ -30,6 +31,7 @@ class MyApp extends StatelessWidget {
         initialRoute: '/',
         routes: {
           '/': (context) => const Wrapper(), //represents the first widget to be built when the app is first opened (when initialRoute not mentioned)
+          '/choose_avatar': (context) => const ChooseAvatar(),
         },
       ),
     );

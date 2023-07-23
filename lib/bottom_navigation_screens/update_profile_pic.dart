@@ -2,15 +2,20 @@
 import 'dart:io';
 import 'package:chat_app/bottom_navigation_screens/profile_page.dart';
 import 'package:chat_app/bottom_navigation_screens/choose_avatar.dart';
+import 'package:chat_app/models/custom_user.dart';
+import 'package:chat_app/services/database.dart';
+import 'package:chat_app/services/storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 // ignore: depend_on_referenced_packages
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:provider/provider.dart';
 
 class UpdateProfilePic extends StatefulWidget {
-  final File? image;
-
-  const UpdateProfilePic({super.key, this.image});
+  final String image;
+  final CustomUser? userData;
+  const UpdateProfilePic({super.key, required this.image, required this.userData});
 
   @override
   State<UpdateProfilePic> createState() => _UpdateProfilePicState();
@@ -20,24 +25,16 @@ class _UpdateProfilePicState extends State<UpdateProfilePic> {
 
   File? _image;
   final picker = ImagePicker();
+  bool isAvatar = false;
+  String avatar = '';
 
   @override
   void initState() {
     super.initState();
-    _image = widget.image;
+    _image = File(widget.image);
   }
 
-  Future<void> saveAndNavigate() async {
-    await uploadImage();
-
-    // Navigate to the ProfilePic information screen
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => Profile(_image)),
-    );
-  }
-
-  Future getImage() async {
+  Future getImageFromGallery() async {
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
 
     setState(() {
@@ -49,25 +46,22 @@ class _UpdateProfilePicState extends State<UpdateProfilePic> {
       }
     });
   }
+  Future getImageFromCamera() async {
+    final pickedFile = await picker.pickImage(source: ImageSource.camera);
 
-  Future uploadImage() async {
-    if (_image == null) {
-      print('No image selected.');
-      return;
-    }
-
-    String fileName = DateTime.now().toString();
-    Reference reference = FirebaseStorage.instance.ref().child(fileName);
-    UploadTask uploadTask = reference.putFile(_image!);
-    TaskSnapshot storageTaskSnapshot = await uploadTask.whenComplete(() {});
-    String imageUrl = await storageTaskSnapshot.ref.getDownloadURL();
-
-    // Perform actions with the uploaded image URL
-    print('Image URL: $imageUrl');
+    setState(() {
+      if (pickedFile != null) {
+        _image = File(pickedFile.path);
+      }
+      else {
+        print('No image selected.');
+      }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+
     return Column(
       children: [
         Row(
@@ -85,7 +79,7 @@ class _UpdateProfilePicState extends State<UpdateProfilePic> {
                   ),
                   Center(
                     child: TextButton(
-                      onPressed: () {},
+                      onPressed: getImageFromCamera,
                       child: const Text('Take Photo', textAlign: TextAlign.center),
                     ),
                   ),
@@ -106,7 +100,7 @@ class _UpdateProfilePicState extends State<UpdateProfilePic> {
                   ),
                   Center(
                     child: TextButton(
-                      onPressed: getImage,
+                      onPressed: getImageFromGallery,
                       child: const Text('Gallery', textAlign: TextAlign.center),
                     ),
                   ),
@@ -126,13 +120,12 @@ class _UpdateProfilePicState extends State<UpdateProfilePic> {
                     child: Icon(Icons.person),
                   ),
                   TextButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const ChooseAvatar(),
-                        ),
-                      );
+                    onPressed: () async {
+                      avatar = await Navigator.pushNamed(context, '/choose_avatar') as String;
+                      setState(() {
+                        _image = File(avatar);
+                        isAvatar = true;
+                      });
                     },
                     child: const Text('Avatar', textAlign: TextAlign.center),
                   ),
@@ -152,7 +145,12 @@ class _UpdateProfilePicState extends State<UpdateProfilePic> {
                   ),
                   Center(
                     child: TextButton(
-                      onPressed: () {
+                      onPressed: () async {
+                        setState(() {
+                          _image = File('');
+                        });
+                        //delete the user's current profile pic and set imagePath of current user to ''
+                        await StorageService(uid: widget.userData!.uid, image: _image).deleteFile();
                         Navigator.pop(context);
                       },
                       child: const Text('No profile photo', textAlign: TextAlign.center),
@@ -167,11 +165,20 @@ class _UpdateProfilePicState extends State<UpdateProfilePic> {
           width: 350.0,
           //height: 100.0,
           child: OutlinedButton(
-            onPressed: () {
-              //confirm selection
+            onPressed: () async {
+              //confirm selection - before popping the bottom sheet, we need to update our cloud storage according the chosen image
+              if (isAvatar) {
+                ByteData imageBytes = await rootBundle.load(avatar);
+                Uint8List imageData = imageBytes.buffer.asUint8List(imageBytes.offsetInBytes, imageBytes.lengthInBytes);
+                await StorageService(uid: widget.userData!.uid, image: _image).uploadAsset(imageData);
+              }
+              else {
+                await StorageService(uid: widget.userData!.uid, image: _image).uploadFile();
+              }
+              await DatabaseService(uid: widget.userData!.uid).updateUserData(widget.userData!.email, widget.userData!.password, widget.userData!.name, widget.userData!.username, _image!.path);
               Navigator.pop(context); //popping the bottom sheet
             },
-            child: const Text("Continue"),
+            child: const Text("Confirm"),
           ),
         ),
       ],

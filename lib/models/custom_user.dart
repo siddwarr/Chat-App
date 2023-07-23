@@ -4,8 +4,9 @@ class CustomUser {
   String username;
   String email;
   String password;
+  String imagePath;
 
-  CustomUser({required this.uid, required this.name, required this.username, required this.email, required this.password});
+  CustomUser({required this.uid, required this.name, required this.username, required this.email, required this.password, required this.imagePath});
 
   Map<String, String> toMap() {
     return {
@@ -14,6 +15,7 @@ class CustomUser {
       'username': username,
       'email': email,
       'password': password,
+      'image': imagePath,
     };
   }
 }

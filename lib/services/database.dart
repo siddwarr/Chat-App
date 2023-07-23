@@ -12,7 +12,7 @@ class DatabaseService {
   // collection reference - for storing chat list of a user
   final CollectionReference collectionReference1 = FirebaseFirestore.instance.collection('chat_list_collection');
 
-  Future updateUserData(String email, String password, String name, String username) async {
+  Future updateUserData(String email, String password, String name, String username, String imagePath) async {
 
     //updating the fields name, sugars and strength in the document corresponding to the user's unique id under the collection 'brew'
     return await collectionReference.doc(uid).set({
@@ -21,6 +21,7 @@ class DatabaseService {
       'password': password,
       'name': name,
       'username': username,
+      'image': imagePath,
     });
   }
 
@@ -53,6 +54,7 @@ class DatabaseService {
       username: snapshot.get('username'),
       email: snapshot.get('email'),
       password: snapshot.get('password'),
+      imagePath: snapshot.get('image'),
     );
   }
 
@@ -72,6 +74,7 @@ class DatabaseService {
         email: doc.get('email') ?? '',
         password: doc.get('password') ?? '',
         uid: doc.get('uid') ?? '',
+        imagePath: doc.get('image') ?? '',
       );
     }).toList();
   }

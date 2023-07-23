@@ -13,11 +13,6 @@ class AuthService {
     return UserUID(uid: user.uid);
   }
 
-  getData(User user) async {
-    DocumentSnapshot documentSnapshot = await DatabaseService(uid: user.uid).collectionReference.doc(user.uid).get();
-    return documentSnapshot;
-  }
-
   //auth change user stream
   //stream - stream between the flutter app and firebase auth service
   //firebase auth service will send either null or some User object through the stream whenever a user signs out or signs in
@@ -50,10 +45,10 @@ class AuthService {
       User? user = result.user; //getting the user credentials
 
       //as soon as the user registers, we create a new document against their uid containing their name and username
-      await DatabaseService(uid: user!.uid).updateUserData(email, password, name, username);
+      await DatabaseService(uid: user!.uid).updateUserData(email, password, name, username, '');
 
       //creating an empty chat list for the newly registered user
-      await DatabaseService(uid: user.uid).createChatList([] as List<Map<String, String>>);
+      await DatabaseService(uid: user.uid).createChatList([]);
 
       return _func1(user); //mapping it to an object of CustomUser and returning it
     }

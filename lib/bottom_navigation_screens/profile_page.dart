@@ -12,9 +12,6 @@ import '../services/database.dart';
 
 class Profile extends StatefulWidget {
 
-  final File? image;
-  const Profile(this.image, {Key? key}) : super(key: key);
-
   @override
   State<Profile> createState() => _ProfileState();
 }
@@ -38,6 +35,9 @@ class _ProfileState extends State<Profile> {
 
   Map data = {};
 
+  List maleAvatars = ['assets/male_avatars/male1.jpg', 'assets/male_avatars/male2.jpg', 'assets/male_avatars/male3.jpg', 'assets/male_avatars/male4.jpg', 'assets/male_avatars/male5.jpg', 'assets/male_avatars/male6.jpg', 'assets/male_avatars/male7.jpg'];
+  List femaleAvatars = ['assets/female_avatars/female1.jpg', 'assets/female_avatars/female2.jpg', 'assets/female_avatars/female3.jpg', 'assets/female_avatars/female4.jpg', 'assets/female_avatars/female5.jpg', 'assets/female_avatars/female6.jpg', 'assets/female_avatars/female7.jpg'];
+
   @override
   Widget build(BuildContext context) {
 
@@ -49,7 +49,7 @@ class _ProfileState extends State<Profile> {
           children: [
             Container(
               padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 20.0),
-              child: const UpdateProfilePic(),
+              child: UpdateProfilePic(image: userData!.imagePath, userData: userData),
             ),
           ]
         );
@@ -95,9 +95,9 @@ class _ProfileState extends State<Profile> {
                     children: [
                       Center(
                         child: CircleAvatar(
-                          backgroundImage: widget.image != null
-                              ? FileImage(widget.image!)
-                              : const AssetImage('assets/avatar.png') as ImageProvider,
+                          backgroundImage: userData.imagePath != ''
+                          ? maleAvatars.contains(userData.imagePath) || femaleAvatars.contains(userData.imagePath) ? AssetImage(userData.imagePath.toString()) : Image.file(File(userData.imagePath)).image
+                          : const AssetImage('assets/avatar.png'),
                           radius: 50.0,
                         ),
                       ),
@@ -107,12 +107,6 @@ class _ProfileState extends State<Profile> {
                         child: GestureDetector(
                           onTap: () {
                             return _showBottomSheet();
-                            // Navigator.push(
-                            //   context,
-                            //   MaterialPageRoute(
-                            //     builder: (context) => ProfilePic(image: widget.image),
-                            //   ),
-                            // );
                           },
                           child: const CircleAvatar(
                             backgroundColor: Colors.amber,
@@ -210,11 +204,11 @@ class _ProfileState extends State<Profile> {
                         }
 
                         if (!valid) {
-                          await DatabaseService(uid: userData.uid).updateUserData(userData.email, currentPassword, currentName, currentUsername);
+                          await DatabaseService(uid: userData.uid).updateUserData(userData.email, currentPassword, currentName, currentUsername, userData.imagePath);
                           //Navigator.pop(context);
                         }
                         else {
-                          error = 'Username taken, please enter again';
+                          error = 'Username taken, please try another';
                         }
                       }
                     },

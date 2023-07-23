@@ -26,34 +26,6 @@ class _ChatRoomState extends State<ChatRoom> {
           widget.userData2['name'],
         ),
       ),
-      // body: Column(
-      //   children: [
-      //     Expanded(
-      //       child: Container(
-      //         //height: 550.0,
-      //         decoration: const BoxDecoration(
-      //           image: DecorationImage(
-      //             image: AssetImage('assets/chat_room_bg.avif'),
-      //             fit: BoxFit.cover,
-      //           ),
-      //         ),
-      //         child: Align(
-      //           alignment: Alignment.bottomCenter,
-      //           child: TextField(
-      //             decoration: InputDecoration(
-      //               border: OutlineInputBorder(
-      //                 borderRadius: BorderRadius.circular(25.0),
-      //               ),
-      //               filled: true,
-      //               fillColor: Colors.white,
-      //               hintText: 'Message',
-      //             ),
-      //           ),
-      //         ),
-      //       ),
-      //     ),
-      //   ],
-      // ),
       body: Stack(
         children: [
           Align(

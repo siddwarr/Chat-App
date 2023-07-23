@@ -30,7 +30,7 @@ class _ProfilePicState extends State<ProfilePic> {
     // Navigate to the ProfilePic information screen
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => Profile(_image)),
+      MaterialPageRoute(builder: (context) => Profile()),
     );
   }
 
