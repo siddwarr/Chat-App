@@ -26,7 +26,7 @@ class SearchTile extends StatelessWidget {
           subtitle: Text(userData.name),
           onTap: () async {
             //add that user to current user's chat list
-            await DatabaseService(uid: currentUserData.uid).addUserToChatList(userChatList, userData);
+            await DatabaseService(uid: currentUserData.uid).addUserToChatList(currentUserData.uid, userChatList, userData);
             Navigator.pop(context);
           },
         ),

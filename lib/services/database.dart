@@ -1,17 +1,19 @@
 import 'dart:core';
+import 'package:chat_app/models/json/custom_message.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:chat_app/models/custom_user.dart';
 
 class DatabaseService {
   final String uid;
-  DatabaseService({required this.uid});
+  String? uid2;
+  DatabaseService({required this.uid, this.uid2});
 
   //collection reference - for storing basic user details
   final CollectionReference collectionReference = FirebaseFirestore.instance.collection('users_collection');
 
   // collection reference - for storing chat list of a user
   final CollectionReference collectionReference1 = FirebaseFirestore.instance.collection('chat_list_collection');
-
+  
   Future updateUserData(String email, String password, String name, String username, String imagePath) async {
 
     //updating the fields name, sugars and strength in the document corresponding to the user's unique id under the collection 'brew'
@@ -31,19 +33,26 @@ class DatabaseService {
     });
   }
 
-  Future addUserToChatList(List<dynamic> chatList, CustomUser newUser) async {
+  Future addUserToChatList(String userUID, List<dynamic> chatList, CustomUser newUser) async {
+    //here, user represents the user whose chat list the new user is to be added to
     Map<String, String> temp = {};
     temp = newUser.toMap();
     List<String> uidList = [];
     for (dynamic map in chatList) {
       uidList.add(map['uid']);
     }
-    if (!uidList.contains(newUser.uid) && newUser.uid != uid) {
+    if (!uidList.contains(newUser.uid) && newUser.uid != userUID) {
       chatList.add(temp);
     }
-    return await collectionReference1.doc(uid).set({
+    return await collectionReference1.doc(userUID).set({
       'list': chatList,
     });
+  }
+
+  Future obtainChatList(String userUID) async {
+    var docSnap =  await collectionReference1.doc(userUID).get();
+    List<dynamic> chatList = docSnap.get('list');
+    return chatList;
   }
 
   //map the DocumentSnapshot object to a CustomUser object
@@ -92,5 +101,49 @@ class DatabaseService {
   Stream<List<dynamic>> get userChatListStream {
     return collectionReference1.doc(uid).snapshots()
         .map(_userChatListFromSnapshot);
+  }
+
+
+
+
+  //unique id for a particular conversation between 2 users
+  String getConversationID(String uid1, String uid2) => uid1.hashCode <= uid2.hashCode
+      ? '${uid1}_$uid2'
+      : '${uid2}_$uid1';
+
+  //stream for obtaining all messages in a particular conversation (with a unique conversation id) between 2 users
+  Stream<QuerySnapshot<Map<String, dynamic>>> get getAllMessages {
+    return FirebaseFirestore.instance.collection('chat_collection/${getConversationID(uid, uid2!)}/messages')
+        .orderBy('sent', descending: false).snapshots();
+  }
+
+  Stream<QuerySnapshot<Map<String, dynamic>>> get getLastMessage {
+    //limit(1) => the last document among the list of all documents in our collection sorted in descending order (according to the time the message was sent)
+    //we are essentially trying to obtain the most recent message that was shared in a particular conversation
+    return FirebaseFirestore.instance.collection('chat_collection/${getConversationID(uid, uid2!)}/messages')
+        .orderBy('sent', descending: true).limit(1).snapshots();
+  }
+
+  Future<void> sendFirstMessage(CustomUser currentUser, List<dynamic> chatList, String message, String type, DateTime time) async {
+    //since this is the first message that current user is sending to the other user, we must add the current user to the chat list of the other user before adding the message to the chat collection
+    await addUserToChatList(uid2!, chatList, currentUser);
+
+    final CustomMessage customMessage = CustomMessage(fromID: uid, toID: uid2!, message: message, type: type, read: '', sent: time.millisecondsSinceEpoch.toString());
+
+    //we have to convert this object to JSON before adding it to our collection 'messages'
+    //each document within this collection is going to represent a particular message (the document will be named after the exact time at which that message was sent)
+    await FirebaseFirestore.instance.collection('chat_collection/${getConversationID(uid, uid2!)}/messages').doc(time.millisecondsSinceEpoch.toString()).set(customMessage.toJson());
+  }
+
+  Future<void> sendMessage(String message, String type, DateTime time) async {
+    final CustomMessage customMessage = CustomMessage(fromID: uid, toID: uid2!, message: message, type: type, read: '', sent: time.millisecondsSinceEpoch.toString());
+
+    //we have to convert this object to JSON before adding it to our collection 'messages'
+    //each document within this collection is going to represent a particular message (the document will be named after the exact time at which that message was sent)
+    await FirebaseFirestore.instance.collection('chat_collection/${getConversationID(uid, uid2!)}/messages').doc(time.millisecondsSinceEpoch.toString()).set(customMessage.toJson());
+  }
+
+  Future<void> deleteMessage(CustomMessage customMessage) async {
+    await FirebaseFirestore.instance.collection('chat_collection/${getConversationID(uid, uid2!)}/messages').doc(customMessage.sent).delete();
   }
 }

@@ -6,7 +6,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../constants.dart';
-import 'update_profile_pic.dart';
+import '../widgets/update_profile_pic.dart';
 import '../services/auth.dart';
 import '../services/database.dart';
 

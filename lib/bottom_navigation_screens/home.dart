@@ -1,11 +1,11 @@
-import 'package:chat_app/bottom_navigation_screens/search_tile.dart';
+import 'package:chat_app/widgets/search_tile.dart';
 import 'package:chat_app/screens/loading.dart';
 import 'package:chat_app/services/database.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/custom_user.dart';
-import 'chat_tile.dart';
+import '../widgets/chat_tile.dart';
 
 class Home extends StatefulWidget {
 
@@ -53,10 +53,10 @@ class _HomeState extends State<Home> {
                   ),
                   //body: Text('length = ${userChatList.length}'),
                   body: ListView.builder(
-                      itemCount: userChatList?.length,
-                      itemBuilder: (context, index) {
-                        return ChatTile(userData1: userData, userData2: userChatList![index]);
-                      }
+                    itemCount: userChatList?.length,
+                    itemBuilder: (context, index) {
+                      return ChatTile(userData1: userData, userData2: userChatList![index]);
+                    }
                   ),
                 );
               }
