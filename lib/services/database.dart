@@ -124,6 +124,15 @@ class DatabaseService {
         .orderBy('sent', descending: true).limit(1).snapshots();
   }
 
+  Future<void> updateMessage(CustomMessage message, String type, String read) async {
+
+    final CustomMessage customMessage = CustomMessage(fromID: message.fromID, toID: message.toID, message: message.message, type: type, read: read, sent: message.sent);
+
+    //we have to convert this object to JSON before adding it to our collection 'messages'
+    //each document within this collection is going to represent a particular message (the document will be named after the exact time at which that message was sent)
+    await FirebaseFirestore.instance.collection('chat_collection/${getConversationID(message.fromID, message.toID)}/messages').doc(message.sent).set(customMessage.toJson());
+  }
+
   Future<void> sendFirstMessage(CustomUser currentUser, List<dynamic> chatList, String message, String type, DateTime time) async {
     //since this is the first message that current user is sending to the other user, we must add the current user to the chat list of the other user before adding the message to the chat collection
     await addUserToChatList(uid2!, chatList, currentUser);

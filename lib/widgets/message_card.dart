@@ -28,7 +28,7 @@ class _MessageCardState extends State<MessageCard> {
 
   Widget _blueMessage() {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      mainAxisAlignment: MainAxisAlignment.start,
       children: [
         //message content
         Flexible(
@@ -39,21 +39,30 @@ class _MessageCardState extends State<MessageCard> {
                 color: const Color.fromARGB(255, 221, 245, 255),
                 border: Border.all(color: Colors.lightBlue),
                 //making borders curved
-                borderRadius: const BorderRadius.only(topLeft: Radius.circular(30), topRight: Radius.circular(30), bottomRight: Radius.circular(30)),
+                borderRadius: const BorderRadius.only(topLeft: Radius.circular(25), topRight: Radius.circular(25), bottomRight: Radius.circular(25)),
             ),
-            child: Text(
-              widget.message.message,
-              style: const TextStyle(fontSize: 15, color: Colors.black87),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  widget.message.message,
+                  style: const TextStyle(fontSize: 16, color: Colors.black87),
+                ),
+                const SizedBox(
+                  height: 5.0,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      getFormattedTime(context: context, time: widget.message.sent),
+                      style: const TextStyle(fontSize: 12, color: Colors.black54),
+                    ),
+                  ],
+                ),
+              ],
             ),
-          ),
-        ),
-
-        //message time
-        Padding(
-          padding: const EdgeInsets.only(right: 10),
-          child: Text(
-            getFormattedTime(context: context, time: widget.message.sent),
-            style: const TextStyle(fontSize: 13, color: Colors.black54),
           ),
         ),
       ],
@@ -63,20 +72,8 @@ class _MessageCardState extends State<MessageCard> {
 
   Widget _greenMessage() {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      mainAxisAlignment: MainAxisAlignment.end,
       children: [
-        //message time
-        Row(
-          children: [
-            //for adding some space
-            const SizedBox(width: 10),
-            //sent time
-            Text(
-              getFormattedTime(context: context, time: widget.message.sent),
-              style: const TextStyle(fontSize: 13, color: Colors.black54),
-            ),
-          ],
-        ),
         //message content
         Flexible(
           child: Container(
@@ -86,11 +83,31 @@ class _MessageCardState extends State<MessageCard> {
               color: const Color.fromARGB(255, 218, 255, 176),
               border: Border.all(color: Colors.lightGreen),
               //making borders curved
-              borderRadius: const BorderRadius.only(topLeft: Radius.circular(30), topRight: Radius.circular(30), bottomLeft: Radius.circular(30)),
+              borderRadius: const BorderRadius.only(topLeft: Radius.circular(25), topRight: Radius.circular(25), bottomLeft: Radius.circular(25)),
             ),
-            child: Text(
-              widget.message.message,
-              style: const TextStyle(fontSize: 15, color: Colors.black87),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Text(
+                  widget.message.message,
+                  style: const TextStyle(fontSize: 16, color: Colors.black87),
+                ),
+                const SizedBox(
+                  height: 5.0,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      getFormattedTime(context: context, time: widget.message.sent),
+                      style: const TextStyle(fontSize: 12, color: Colors.black54),
+                    ),
+                    const SizedBox(width: 10),
+                    Icon(Icons.done_all, size: 15, color: widget.message.read == '' ? Colors.grey : Colors.blue),
+                  ],
+                ),
+              ],
             ),
           ),
         ),
