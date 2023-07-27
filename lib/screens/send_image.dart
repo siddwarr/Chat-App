@@ -24,9 +24,23 @@ class _SendImageState extends State<SendImage> {
     return Scaffold(
       body: Stack(
         children: [
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 50.0, vertical: 30.0),
-            child: Image.file(File(widget.image)),
+          Padding(
+            padding: const EdgeInsets.only(top: 20.0, right: 10.0),
+            child: Align(
+              alignment: Alignment.topRight,
+              child: IconButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                icon: const Icon(Icons.clear),
+              ),
+            ),
+          ),
+          Center(
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 50.0, vertical: 30.0),
+              child: Image.file(File(widget.image)),
+            ),
           ),
           Align(
             alignment: Alignment.bottomCenter,
