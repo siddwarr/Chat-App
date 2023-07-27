@@ -1,9 +1,12 @@
+import 'dart:io';
 import 'package:chat_app/models/json/custom_message.dart';
 import 'package:chat_app/services/database.dart';
 import 'package:chat_app/widgets/message_card.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import '../models/custom_user.dart';
+import '../screens/send_image.dart';
 
 class ChatRoom extends StatefulWidget {
   final CustomUser userData1;
@@ -17,10 +20,28 @@ class ChatRoom extends StatefulWidget {
 
 class _ChatRoomState extends State<ChatRoom> {
 
+  File? _image;
+  final picker = ImagePicker();
+
   final TextEditingController _controller = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   late DateTime time;
   bool isReverse = true;
+
+  Future getImageFromCamera() async {
+    final pickedFile = await picker.pickImage(source: ImageSource.camera);
+
+    setState(() {
+      if (pickedFile != null) {
+        _image = File(pickedFile.path);
+        //if the user has selected a picture, we push a screen that displays the image to be sent along with a text field to type in a message along with the image, and finally the send button
+        Navigator.of(context).push(MaterialPageRoute(builder: (context) => SendImage(image: pickedFile.path, userData1: widget.userData1, userData2: widget.userData2)));
+      }
+      else {
+        print('No image selected.');
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -91,18 +112,19 @@ class _ChatRoomState extends State<ChatRoom> {
                             ),
                           ),
                         ),
-                        const SizedBox(
-                          width: 10.0,
+                        IconButton(
+                          onPressed: getImageFromCamera,
+                          icon: const Icon(Icons.camera_alt, size: 25.0),
                         ),
-                        FloatingActionButton(
+                        FloatingActionButton.small(
                           onPressed: () async {
 
                             time = DateTime.now();
                             //case 1: the list is empty and this is the first message of the conversation (we have to add current user to the chat list of the other user and then send the message)
                             final chatList = await DatabaseService(uid: widget.userData1.uid).obtainChatList(widget.userData2['uid']);
-                            await DatabaseService(uid: widget.userData1.uid, uid2: widget.userData2['uid']).sendFirstMessage(widget.userData1, chatList, _controller.text, 'text', time);
+                            await DatabaseService(uid: widget.userData1.uid, uid2: widget.userData2['uid']).sendFirstMessage(widget.userData1, chatList, _controller.text, time);
                             //case 2: the list is not empty
-                            await DatabaseService(uid: widget.userData1.uid, uid2: widget.userData2['uid']).sendMessage(_controller.text, 'text', time);
+                            await DatabaseService(uid: widget.userData1.uid, uid2: widget.userData2['uid']).sendMessage(_controller.text, time, '', '');
 
                             setState(() {
                               isReverse = false;
@@ -110,7 +132,7 @@ class _ChatRoomState extends State<ChatRoom> {
                               _controller.clear();
                             });
                           },
-                          child: const Icon(Icons.send),
+                          child: const Icon(Icons.send, size: 20.0),
                         )
                       ],
                     ),

@@ -1,7 +1,5 @@
 // ignore_for_file: library_private_types_in_public_api, use_build_context_synchronously
 import 'dart:io';
-import 'package:chat_app/bottom_navigation_screens/profile_page.dart';
-import 'package:chat_app/bottom_navigation_screens/choose_avatar.dart';
 import 'package:chat_app/models/custom_user.dart';
 import 'package:chat_app/services/database.dart';
 import 'package:chat_app/services/storage.dart';
@@ -9,8 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 // ignore: depend_on_referenced_packages
 import 'package:image_picker/image_picker.dart';
-import 'package:firebase_storage/firebase_storage.dart';
-import 'package:provider/provider.dart';
 
 class UpdateProfilePic extends StatefulWidget {
   final String image;
@@ -163,7 +159,6 @@ class _UpdateProfilePicState extends State<UpdateProfilePic> {
         ),
         SizedBox(
           width: 350.0,
-          //height: 100.0,
           child: OutlinedButton(
             onPressed: () async {
               //confirm selection - before popping the bottom sheet, we need to update our cloud storage according the chosen image
@@ -173,7 +168,7 @@ class _UpdateProfilePicState extends State<UpdateProfilePic> {
                 await StorageService(uid: widget.userData!.uid, image: _image).uploadAsset(imageData);
               }
               else {
-                await StorageService(uid: widget.userData!.uid, image: _image).uploadFile();
+                await StorageService(uid: widget.userData!.uid, image: _image).uploadProfilePic(widget.userData!.uid, 'profile_pics');
               }
               await DatabaseService(uid: widget.userData!.uid).updateUserData(widget.userData!.email, widget.userData!.password, widget.userData!.name, widget.userData!.username, _image!.path);
               Navigator.pop(context); //popping the bottom sheet

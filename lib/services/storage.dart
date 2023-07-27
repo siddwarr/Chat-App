@@ -9,14 +9,30 @@ class StorageService {
 
   final FirebaseStorage firebaseStorage = FirebaseStorage.instance;
 
-  Future uploadFile() async {
+  Future uploadProfilePic(String userUID, String folder) async {
     if (image == null) {
       print('No image selected.');
       return;
     }
 
-    String fileName = uid;
-    Reference reference = FirebaseStorage.instance.ref('profile_pics').child(fileName);
+    String fileName = userUID;
+    Reference reference = FirebaseStorage.instance.ref(folder).child(fileName);
+    UploadTask uploadTask = reference.putFile(image!);
+    TaskSnapshot storageTaskSnapshot = await uploadTask.whenComplete(() {});
+    String imageUrl = await storageTaskSnapshot.ref.getDownloadURL();
+
+    // Perform actions with the uploaded image URL
+    print('Image URL: $imageUrl');
+  }
+
+  Future uploadImage(String sent, String folder) async {
+    if (image == null) {
+      print('No image selected.');
+      return;
+    }
+
+    String fileName = sent;
+    Reference reference = FirebaseStorage.instance.ref(folder).child(fileName);
     UploadTask uploadTask = reference.putFile(image!);
     TaskSnapshot storageTaskSnapshot = await uploadTask.whenComplete(() {});
     String imageUrl = await storageTaskSnapshot.ref.getDownloadURL();

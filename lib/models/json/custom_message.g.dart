@@ -11,9 +11,12 @@ CustomMessage _$CustomMessageFromJson(Map<String, dynamic> json) =>
       fromID: json['fromID'] as String,
       toID: json['toID'] as String,
       message: json['message'] as String,
+      image: json['image'] as String,
       type: json['type'] as String,
       read: json['read'] as String,
       sent: json['sent'] as String,
+      imageReply: json['imageReply'] as String,
+      textReply: json['textReply'] as String,
     );
 
 Map<String, dynamic> _$CustomMessageToJson(CustomMessage instance) =>
@@ -21,7 +24,10 @@ Map<String, dynamic> _$CustomMessageToJson(CustomMessage instance) =>
       'fromID': instance.fromID,
       'toID': instance.toID,
       'message': instance.message,
+      'image': instance.image,
       'type': instance.type,
       'read': instance.read,
       'sent': instance.sent,
+      'imageReply': instance.imageReply,
+      'textReply': instance.textReply,
     };

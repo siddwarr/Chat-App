@@ -5,7 +5,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import '../models/custom_user.dart';
 import 'dart:io';
-
 import '../models/json/custom_message.dart';
 
 class ChatTile extends StatefulWidget {
@@ -28,6 +27,7 @@ class _ChatTileState extends State<ChatTile> {
   List femaleAvatars = ['assets/female_avatars/female1.jpg', 'assets/female_avatars/female2.jpg', 'assets/female_avatars/female3.jpg', 'assets/female_avatars/female4.jpg', 'assets/female_avatars/female5.jpg', 'assets/female_avatars/female6.jpg', 'assets/female_avatars/female7.jpg'];
 
   int unread = 0;
+  String lastMessage = '', sent = '';
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +38,10 @@ class _ChatTileState extends State<ChatTile> {
         if (snapshot.hasData) {
 
           final list = snapshot.data?.docs;
-          final lastMessage = snapshot.data?.docs[snapshot.data!.docs.length - 1];
+          if (snapshot.data!.docs.isNotEmpty) {
+            lastMessage = snapshot.data?.docs[snapshot.data!.docs.length - 1].data()['message'];
+            sent = snapshot.data?.docs[snapshot.data!.docs.length - 1].data()['sent'];
+          }
           //traversing the list of all messages in reverse order until we encounter a read message
           unread = 0;
           for (int i = list!.length - 1; i >= 0; i--) {
@@ -60,8 +63,8 @@ class _ChatTileState extends State<ChatTile> {
               child: ListTile(
                 leading: CircleAvatar(
                   radius: 20.0,
-                  backgroundImage: widget.userData1.imagePath != ''
-                      ? maleAvatars.contains(widget.userData1.imagePath) || femaleAvatars.contains(widget.userData1.imagePath) ? AssetImage(widget.userData1.imagePath.toString()) : Image.file(File(widget.userData1.imagePath)).image
+                  backgroundImage: widget.userData2['image'] != ''
+                      ? maleAvatars.contains(widget.userData2['image']) || femaleAvatars.contains(widget.userData2['image']) ? AssetImage(widget.userData2['image'].toString()) : Image.file(File(widget.userData2['image'])).image
                       : const AssetImage('assets/avatar.png'),
                 ),
                 title: Row(
@@ -69,7 +72,7 @@ class _ChatTileState extends State<ChatTile> {
                   children: [
                     Text(widget.userData2['username']),
                     Text(
-                      getFormattedTime(context: context, time: lastMessage?.data()['sent']),
+                      sent == '' ? '' : getFormattedTime(context: context, time: sent),
                       style: const TextStyle(
                         fontSize: 13.0,
                       ),
@@ -77,11 +80,35 @@ class _ChatTileState extends State<ChatTile> {
                   ],
                 ),
                 subtitle: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  //mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      '${(CustomMessage.fromJson(lastMessage!.data()).fromID) == widget.userData1.uid ? 'You' : widget.userData2['name']}: ${lastMessage.data()['message']}',
-                    ),
+                    snapshot.data?.docs[snapshot.data!.docs.length - 1].data()['fromID'] == widget.userData1.uid
+                    ?
+                    Row(
+                      children: [
+                        Icon(Icons.done_all, size: 15, color: snapshot.data?.docs[snapshot.data!.docs.length - 1].data()['read'] == '' ? Colors.grey : Colors.blue),
+                        const SizedBox(width: 5),
+                      ],
+                    )
+                    :
+                    const SizedBox.shrink(),
+
+                    lastMessage == ''
+                    ?
+                    const Row(
+                      children: [
+                        Icon(Icons.photo, size: 16),
+                        SizedBox(
+                          width: 5,
+                        ),
+                        Text('Photo'),
+                      ],
+                    )
+                    :
+                    Text(lastMessage),
+
+                    const Spacer(),
+
                     unread == 0 ?
                     const Text('')
                     :
@@ -110,7 +137,7 @@ class _ChatTileState extends State<ChatTile> {
                     //we have to mark all the messages sent my the other user as read
                     if (list[i].data()['fromID'] != widget.userData1.uid) {
                       if (list[i].data()['read'] == '') {
-                        await DatabaseService(uid: widget.userData1.uid).updateMessage(CustomMessage.fromJson(list[i].data()), 'text', time.millisecondsSinceEpoch.toString());
+                        await DatabaseService(uid: widget.userData1.uid).updateMessage(CustomMessage.fromJson(list[i].data()), time.millisecondsSinceEpoch.toString());
                       }
                       else {
                         break;

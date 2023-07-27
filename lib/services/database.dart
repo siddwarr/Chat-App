@@ -1,5 +1,7 @@
 import 'dart:core';
+import 'dart:io';
 import 'package:chat_app/models/json/custom_message.dart';
+import 'package:chat_app/services/storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:chat_app/models/custom_user.dart';
 
@@ -124,35 +126,61 @@ class DatabaseService {
         .orderBy('sent', descending: true).limit(1).snapshots();
   }
 
-  Future<void> updateMessage(CustomMessage message, String type, String read) async {
+  Future<void> updateMessage(CustomMessage message, String read) async {
 
-    final CustomMessage customMessage = CustomMessage(fromID: message.fromID, toID: message.toID, message: message.message, type: type, read: read, sent: message.sent);
+    final CustomMessage customMessage = CustomMessage(fromID: message.fromID, toID: message.toID, message: message.message, image: message.image, type: message.type, read: read, sent: message.sent, imageReply: message.imageReply, textReply: message.textReply);
 
     //we have to convert this object to JSON before adding it to our collection 'messages'
     //each document within this collection is going to represent a particular message (the document will be named after the exact time at which that message was sent)
     await FirebaseFirestore.instance.collection('chat_collection/${getConversationID(message.fromID, message.toID)}/messages').doc(message.sent).set(customMessage.toJson());
   }
 
-  Future<void> sendFirstMessage(CustomUser currentUser, List<dynamic> chatList, String message, String type, DateTime time) async {
+  Future<void> sendFirstMessage(CustomUser currentUser, List<dynamic> chatList, String message, DateTime time) async {
     //since this is the first message that current user is sending to the other user, we must add the current user to the chat list of the other user before adding the message to the chat collection
     await addUserToChatList(uid2!, chatList, currentUser);
 
-    final CustomMessage customMessage = CustomMessage(fromID: uid, toID: uid2!, message: message, type: type, read: '', sent: time.millisecondsSinceEpoch.toString());
+    final CustomMessage customMessage = CustomMessage(fromID: uid, toID: uid2!, message: message, image: '', type: 'text', read: '', sent: time.millisecondsSinceEpoch.toString(), imageReply: '', textReply: '');
 
     //we have to convert this object to JSON before adding it to our collection 'messages'
     //each document within this collection is going to represent a particular message (the document will be named after the exact time at which that message was sent)
     await FirebaseFirestore.instance.collection('chat_collection/${getConversationID(uid, uid2!)}/messages').doc(time.millisecondsSinceEpoch.toString()).set(customMessage.toJson());
   }
 
-  Future<void> sendMessage(String message, String type, DateTime time) async {
-    final CustomMessage customMessage = CustomMessage(fromID: uid, toID: uid2!, message: message, type: type, read: '', sent: time.millisecondsSinceEpoch.toString());
+  Future<void> sendFirstImage(CustomUser currentUser, List<dynamic> chatList, String image, DateTime time) async {
+    //since this is the first message that current user is sending to the other user, we must add the current user to the chat list of the other user before adding the message to the chat collection
+    await addUserToChatList(uid2!, chatList, currentUser);
+
+    final CustomMessage customMessage = CustomMessage(fromID: uid, toID: uid2!, message: '', image: image, type: 'image', read: '', sent: time.millisecondsSinceEpoch.toString(), imageReply: '', textReply: '');
 
     //we have to convert this object to JSON before adding it to our collection 'messages'
     //each document within this collection is going to represent a particular message (the document will be named after the exact time at which that message was sent)
     await FirebaseFirestore.instance.collection('chat_collection/${getConversationID(uid, uid2!)}/messages').doc(time.millisecondsSinceEpoch.toString()).set(customMessage.toJson());
+    await StorageService(uid: uid, image: File(image)).uploadImage(time.millisecondsSinceEpoch.toString(), 'chat_images/${getConversationID(uid, uid2!)}/images');
+  }
+
+  Future<void> sendMessage(String message, DateTime time, String imageReply, String textReply) async {
+    final CustomMessage customMessage = CustomMessage(fromID: uid, toID: uid2!, message: message, image: '', type: 'text', read: '', sent: time.millisecondsSinceEpoch.toString(), imageReply: imageReply, textReply: textReply);
+
+    //we have to convert this object to JSON before adding it to our collection 'messages'
+    //each document within this collection is going to represent a particular message (the document will be named after the exact time at which that message was sent)
+    await FirebaseFirestore.instance.collection('chat_collection/${getConversationID(uid, uid2!)}/messages').doc(time.millisecondsSinceEpoch.toString()).set(customMessage.toJson());
+  }
+
+  Future<void> sendImage(String image, DateTime time, String imageReply, String textReply) async {
+    final CustomMessage customMessage = CustomMessage(fromID: uid, toID: uid2!, message: '', image: image, type: 'image', read: '', sent: time.millisecondsSinceEpoch.toString(), imageReply: imageReply, textReply: textReply);
+
+    //we have to convert this object to JSON before adding it to our collection 'messages'
+    //each document within this collection is going to represent a particular message (the document will be named after the exact time at which that message was sent)
+    await FirebaseFirestore.instance.collection('chat_collection/${getConversationID(uid, uid2!)}/messages').doc(time.millisecondsSinceEpoch.toString()).set(customMessage.toJson());
+    await StorageService(uid: uid, image: File(image)).uploadImage(time.millisecondsSinceEpoch.toString(), 'chat_images/${getConversationID(uid, uid2!)}/images');
   }
 
   Future<void> deleteMessage(CustomMessage customMessage) async {
     await FirebaseFirestore.instance.collection('chat_collection/${getConversationID(uid, uid2!)}/messages').doc(customMessage.sent).delete();
+  }
+
+  Future<void> deleteImage(CustomMessage customMessage) async {
+    await FirebaseFirestore.instance.collection('chat_collection/${getConversationID(uid, uid2!)}/messages').doc(customMessage.sent).delete();
+    //apart from deleting the document from the collection, we also must delete the corresponding file from our storage
   }
 }

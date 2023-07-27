@@ -1,6 +1,5 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-
 import '../models/custom_user.dart';
 import '../models/json/custom_message.dart';
 
@@ -23,7 +22,18 @@ class _MessageCardState extends State<MessageCard> {
 
   @override
   Widget build(BuildContext context) {
-    return widget.message.fromID == widget.userData1.uid ? _greenMessage() : _blueMessage();
+    if (widget.message.fromID == widget.userData1.uid && widget.message.image == '') {
+      return _greenMessage();
+    }
+    else if (widget.message.fromID != widget.userData1.uid && widget.message.image == '') {
+      return _blueMessage();
+    }
+    else if (widget.message.fromID == widget.userData1.uid && widget.message.image != '') {
+      return _greenImage();
+    }
+    else {
+      return _blueImage();
+    }
   }
 
   Widget _blueMessage() {
@@ -103,7 +113,95 @@ class _MessageCardState extends State<MessageCard> {
                       getFormattedTime(context: context, time: widget.message.sent),
                       style: const TextStyle(fontSize: 12, color: Colors.black54),
                     ),
-                    const SizedBox(width: 10),
+                    const SizedBox(width: 5),
+                    Icon(Icons.done_all, size: 15, color: widget.message.read == '' ? Colors.grey : Colors.blue),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+
+  Widget _blueImage() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        //message content
+        Flexible(
+          child: Container(
+            height: 280,
+            width: 200,
+            padding: const EdgeInsets.all(10),
+            margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+            decoration: BoxDecoration(
+              color: const Color.fromARGB(255, 221, 245, 255),
+              border: Border.all(color: Colors.lightBlue),
+              //making borders curved
+              borderRadius: const BorderRadius.only(topLeft: Radius.circular(25), topRight: Radius.circular(25), bottomRight: Radius.circular(25)),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Image.file(File(widget.message.image)),
+                const SizedBox(
+                  height: 5.0,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      getFormattedTime(context: context, time: widget.message.sent),
+                      style: const TextStyle(fontSize: 12, color: Colors.black54),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+
+  Widget _greenImage() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: [
+        //message content
+        Flexible(
+          child: Container(
+            height: 280,
+            width: 200,
+            padding: const EdgeInsets.all(10),
+            margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+            decoration: BoxDecoration(
+              color: const Color.fromARGB(255, 218, 255, 176),
+              border: Border.all(color: Colors.lightGreen),
+              //making borders curved
+              borderRadius: const BorderRadius.only(topLeft: Radius.circular(25), topRight: Radius.circular(25), bottomLeft: Radius.circular(25)),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Image.file(File(widget.message.image)),
+                const SizedBox(
+                  height: 5.0,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      getFormattedTime(context: context, time: widget.message.sent),
+                      style: const TextStyle(fontSize: 12, color: Colors.black54),
+                    ),
+                    const SizedBox(width: 5),
                     Icon(Icons.done_all, size: 15, color: widget.message.read == '' ? Colors.grey : Colors.blue),
                   ],
                 ),
