@@ -27,7 +27,8 @@ class _ChatTileState extends State<ChatTile> {
   List femaleAvatars = ['assets/female_avatars/female1.jpg', 'assets/female_avatars/female2.jpg', 'assets/female_avatars/female3.jpg', 'assets/female_avatars/female4.jpg', 'assets/female_avatars/female5.jpg', 'assets/female_avatars/female6.jpg', 'assets/female_avatars/female7.jpg'];
 
   int unread = 0;
-  String lastMessage = '', lastImage = '', sent = '';
+  String lastMessage = '', lastImage = '', sent = '', fromID = '';
+  bool isVisible = true;
 
   @override
   Widget build(BuildContext context) {
@@ -39,9 +40,16 @@ class _ChatTileState extends State<ChatTile> {
 
           final list = snapshot.data?.docs;
           if (snapshot.data!.docs.isNotEmpty) {
-            lastMessage = snapshot.data?.docs[snapshot.data!.docs.length - 1].data()['message'];
-            lastImage = snapshot.data?.docs[snapshot.data!.docs.length - 1].data()['image'];
-            sent = snapshot.data?.docs[snapshot.data!.docs.length - 1].data()['sent'];
+            //traversing the list of all messages in reverse order until we encounter the first 'visible' message
+            for (int i = list!.length - 1; i >= 0; i--) {
+              if (list[i].data()['visibleTo'].contains(widget.userData1.uid)) {
+                lastMessage = list[i].data()['message'];
+                lastImage = list[i].data()['image'];
+                sent = list[i].data()['sent'];
+                fromID = list[i].data()['fromID'];
+                break;
+              }
+            }
           }
           //traversing the list of all messages in reverse order until we encounter a read message
           unread = 0;
@@ -89,7 +97,7 @@ class _ChatTileState extends State<ChatTile> {
                     ?
                     const SizedBox.shrink()
                     :
-                    snapshot.data?.docs[snapshot.data!.docs.length - 1].data()['fromID'] == widget.userData1.uid
+                    fromID == widget.userData1.uid
                     ?
                     Row(
                       children: [
@@ -100,13 +108,16 @@ class _ChatTileState extends State<ChatTile> {
                     :
                     const SizedBox.shrink()
                     :
+                    fromID == widget.userData1.uid
+                    ?
                     Row(
                       children: [
                         Icon(Icons.done_all, size: 15, color: snapshot.data?.docs[snapshot.data!.docs.length - 1].data()['read'] == '' ? Colors.grey : Colors.blue),
                         const SizedBox(width: 5),
                       ],
-                    ),
-
+                    )
+                    :
+                    const SizedBox.shrink(),
 
 
                     lastMessage == ''
@@ -157,7 +168,7 @@ class _ChatTileState extends State<ChatTile> {
                     //we have to mark all the messages sent my the other user as read
                     if (list[i].data()['fromID'] != widget.userData1.uid) {
                       if (list[i].data()['read'] == '') {
-                        await DatabaseService(uid: widget.userData1.uid).updateMessage(CustomMessage.fromJson(list[i].data()), time.millisecondsSinceEpoch.toString(), false);
+                        await DatabaseService(uid: widget.userData1.uid).updateMessage(CustomMessage.fromJson(list[i].data()), time.millisecondsSinceEpoch.toString(), false, snapshot.data?.docs[snapshot.data!.docs.length - 1].data()['visibleTo']);
                       }
                       else {
                         break;

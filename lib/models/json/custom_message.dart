@@ -13,8 +13,9 @@ class CustomMessage {
   String imageReply; //path of the image to which current message is a reply
   String textReply; //text message to which current message is a reply
   bool isSelected;
+  List<dynamic> visibleTo;
 
-  CustomMessage({required this.fromID, required this.toID, required this.message, required this.image, required this.type, required this.read, required this.sent, required this.imageReply, required this.textReply, required this.isSelected});
+  CustomMessage({required this.fromID, required this.toID, required this.message, required this.image, required this.type, required this.read, required this.sent, required this.imageReply, required this.textReply, required this.isSelected, required this.visibleTo});
 
   factory CustomMessage.fromJson(Map<String, dynamic> json) => _$CustomMessageFromJson(json);
 

@@ -46,13 +46,13 @@ class _MessageCardState extends State<MessageCard> {
         onLongPress: () async {
           if (widget.selected == 0) {
             //here, we have to update the 'selected' property of the current message to true
-            await DatabaseService(uid: widget.userData1.uid, uid2: widget.userData2['uid']).updateMessage(widget.message, widget.message.read, true);
+            await DatabaseService(uid: widget.userData1.uid, uid2: widget.userData2['uid']).updateMessage(widget.message, widget.message.read, true, widget.message.visibleTo);
           }
         },
         onTap: () async {
           if (widget.selected > 0) {
             //at least 1 message is selected => negate the selected status of the tapped message
-            await DatabaseService(uid: widget.userData1.uid, uid2: widget.userData2['uid']).updateMessage(widget.message, widget.message.read, !widget.message.isSelected);
+            await DatabaseService(uid: widget.userData1.uid, uid2: widget.userData2['uid']).updateMessage(widget.message, widget.message.read, !widget.message.isSelected, widget.message.visibleTo);
           }
         },
         child: Row(
@@ -108,13 +108,13 @@ class _MessageCardState extends State<MessageCard> {
         onLongPress: () async {
           if (widget.selected == 0) {
             //here, we have to update the 'selected' property of the current message to true
-            await DatabaseService(uid: widget.userData1.uid, uid2: widget.userData2['uid']).updateMessage(widget.message, widget.message.read, true);
+            await DatabaseService(uid: widget.userData1.uid, uid2: widget.userData2['uid']).updateMessage(widget.message, widget.message.read, true, widget.message.visibleTo);
           }
         },
         onTap: () async {
           if (widget.selected > 0) {
             //at least 1 message is selected => negate the selected status of the tapped message
-            await DatabaseService(uid: widget.userData1.uid, uid2: widget.userData2['uid']).updateMessage(widget.message, widget.message.read, !widget.message.isSelected);
+            await DatabaseService(uid: widget.userData1.uid, uid2: widget.userData2['uid']).updateMessage(widget.message, widget.message.read, !widget.message.isSelected, widget.message.visibleTo);
           }
         },
         child: Row(
@@ -172,13 +172,13 @@ class _MessageCardState extends State<MessageCard> {
         onLongPress: () async {
           if (widget.selected == 0) {
             //here, we have to update the 'selected' property of the current message to true
-            await DatabaseService(uid: widget.userData1.uid, uid2: widget.userData2['uid']).updateMessage(widget.message, widget.message.read, true);
+            await DatabaseService(uid: widget.userData1.uid, uid2: widget.userData2['uid']).updateMessage(widget.message, widget.message.read, true, widget.message.visibleTo);
           }
         },
         onTap: () async {
           if (widget.selected > 0) {
             //at least 1 message is selected => negate the selected status of the tapped message
-            await DatabaseService(uid: widget.userData1.uid, uid2: widget.userData2['uid']).updateMessage(widget.message, widget.message.read, !widget.message.isSelected);
+            await DatabaseService(uid: widget.userData1.uid, uid2: widget.userData2['uid']).updateMessage(widget.message, widget.message.read, !widget.message.isSelected, widget.message.visibleTo);
           }
         },
         child: Row(
@@ -233,13 +233,13 @@ class _MessageCardState extends State<MessageCard> {
         onLongPress: () async {
           if (widget.selected == 0) {
             //here, we have to update the 'selected' property of the current message to true
-            await DatabaseService(uid: widget.userData1.uid, uid2: widget.userData2['uid']).updateMessage(widget.message, widget.message.read, true);
+            await DatabaseService(uid: widget.userData1.uid, uid2: widget.userData2['uid']).updateMessage(widget.message, widget.message.read, true, widget.message.visibleTo);
           }
         },
         onTap: () async {
           if (widget.selected > 0) {
             //at least 1 message is selected => negate the selected status of the tapped message
-            await DatabaseService(uid: widget.userData1.uid, uid2: widget.userData2['uid']).updateMessage(widget.message, widget.message.read, !widget.message.isSelected);
+            await DatabaseService(uid: widget.userData1.uid, uid2: widget.userData2['uid']).updateMessage(widget.message, widget.message.read, !widget.message.isSelected, widget.message.visibleTo);
           }
         },
         child: Row(

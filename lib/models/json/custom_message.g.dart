@@ -18,6 +18,7 @@ CustomMessage _$CustomMessageFromJson(Map<String, dynamic> json) =>
       imageReply: json['imageReply'] as String,
       textReply: json['textReply'] as String,
       isSelected: json['isSelected'] as bool,
+      visibleTo: json['visibleTo'] as List<dynamic>
     );
 
 Map<String, dynamic> _$CustomMessageToJson(CustomMessage instance) =>
@@ -32,4 +33,5 @@ Map<String, dynamic> _$CustomMessageToJson(CustomMessage instance) =>
       'imageReply': instance.imageReply,
       'textReply': instance.textReply,
       'isSelected': instance.isSelected,
+      'visibleTo': instance.visibleTo,
     };

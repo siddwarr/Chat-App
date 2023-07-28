@@ -79,7 +79,7 @@ class _ChatRoomState extends State<ChatRoom> {
                 });
                 for (int i = 0; i < list.length; i++) {
                   if (CustomMessage.fromJson(list[i].data()).isSelected) {
-                    await DatabaseService(uid: widget.userData1.uid, uid2: widget.userData2['uid']).updateMessage(CustomMessage.fromJson(list[i].data()), CustomMessage.fromJson(list[i].data()).read, false);
+                    await DatabaseService(uid: widget.userData1.uid, uid2: widget.userData2['uid']).updateMessage(CustomMessage.fromJson(list[i].data()), CustomMessage.fromJson(list[i].data()).read, false, CustomMessage.fromJson(list[i].data()).visibleTo);
                   }
                 }
               },
@@ -92,12 +92,6 @@ class _ChatRoomState extends State<ChatRoom> {
                     return AlertDialog(
                       title: Text('Do you want to delete $selected messages?'),
                       actions: [
-                        TextButton(
-                          onPressed: () {
-                            Navigator.pop(context);
-                          },
-                          child: const Text('Cancel'),
-                        ),
                         TextButton(
                           onPressed: () async {
                             setState(() {
@@ -115,8 +109,28 @@ class _ChatRoomState extends State<ChatRoom> {
                             }
                             Navigator.pop(context);
                           },
-                          child: const Text('Delete'),
-                        )
+                          child: const Text('Delete for everyone'),
+                        ),
+                        TextButton(
+                          onPressed: () async {
+                            setState(() {
+                              selected = 0;
+                            });
+                            for (int i = 0; i < list.length; i++) {
+                              if (CustomMessage.fromJson(list[i].data()).isSelected) {
+                                await DatabaseService(uid: widget.userData1.uid, uid2: widget.userData2['uid']).updateMessage(CustomMessage.fromJson(list[i].data()), CustomMessage.fromJson(list[i].data()).read, false, ['', widget.userData2['uid']]);
+                              }
+                            }
+                            Navigator.pop(context);
+                          },
+                          child: const Text('Delete for me'),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          child: const Text('Cancel'),
+                        ),
                       ],
                     );
                   });
@@ -167,10 +181,20 @@ class _ChatRoomState extends State<ChatRoom> {
                     itemCount: list.length,
                     itemBuilder: (context, index) {
                       if (isReverse) {
-                        return MessageCard(userData1: widget.userData1, userData2: widget.userData2, message: CustomMessage.fromJson(list[list.length - index - 1].data()), selected: selected);
+                        if (CustomMessage.fromJson(list[list.length - index - 1].data()).visibleTo.contains(widget.userData1.uid)) {
+                          return MessageCard(userData1: widget.userData1, userData2: widget.userData2, message: CustomMessage.fromJson(list[list.length - index - 1].data()), selected: selected);
+                        }
+                        else {
+                          return const SizedBox.shrink();
+                        }
                       }
                       else {
-                        return MessageCard(userData1: widget.userData1, userData2: widget.userData2, message: CustomMessage.fromJson(list[index].data()), selected: selected);
+                        if (CustomMessage.fromJson(list[index].data()).visibleTo.contains(widget.userData1.uid)) {
+                          return MessageCard(userData1: widget.userData1, userData2: widget.userData2, message: CustomMessage.fromJson(list[index].data()), selected: selected);
+                        }
+                        else {
+                          return const SizedBox.shrink();
+                        }
                       }
                     },
                   ),
