@@ -146,7 +146,7 @@ class _UpdateProfilePicState extends State<UpdateProfilePic> {
                           _image = File('');
                         });
                         //delete the user's current profile pic and set imagePath of current user to ''
-                        await StorageService(uid: widget.userData!.uid, image: _image).deleteFile();
+                        await StorageService(uid: widget.userData!.uid, image: _image).deleteFile('profile_pics', widget.userData!.uid);
                         Navigator.pop(context);
                       },
                       child: const Text('No profile photo', textAlign: TextAlign.center),

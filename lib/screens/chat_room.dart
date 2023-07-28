@@ -6,7 +6,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import '../models/custom_user.dart';
-import '../screens/send_image.dart';
+import 'send_image.dart';
 
 class ChatRoom extends StatefulWidget {
   final CustomUser userData1;
@@ -27,6 +27,7 @@ class _ChatRoomState extends State<ChatRoom> {
   final ScrollController _scrollController = ScrollController();
   late DateTime time;
   bool isReverse = true;
+  int selected = 0;
 
   Future getImageFromCamera() async {
     final pickedFile = await picker.pickImage(source: ImageSource.camera);
@@ -35,7 +36,7 @@ class _ChatRoomState extends State<ChatRoom> {
       if (pickedFile != null) {
         _image = File(pickedFile.path);
         //if the user has selected a picture, we push a screen that displays the image to be sent along with a text field to type in a message along with the image, and finally the send button
-        Navigator.of(context).push(MaterialPageRoute(builder: (context) => SendImage(image: pickedFile.path, userData1: widget.userData1, userData2: widget.userData2)));
+        Navigator.of(context).push(MaterialPageRoute(builder: (context) => SendImage(image: _image, userData1: widget.userData1, userData2: widget.userData2)));
       }
       else {
         print('No image selected.');
@@ -58,19 +59,102 @@ class _ChatRoomState extends State<ChatRoom> {
           
           final list = snapshot.data?.docs;
 
-          return Scaffold(
-            appBar: AppBar(
-              leading: IconButton(
-                icon: const Icon(Icons.arrow_back),
-                iconSize: 20.0,
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-              ),
-              title: Text(
-                widget.userData2['name'],
-              ),
+          selected = 0;
+
+          //iterating through the messages to find the number of messages selected
+          for (int i = 0; i < list!.length; i++) {
+            if (CustomMessage.fromJson(list[i].data()).isSelected) {
+              selected++;
+            }
+          }
+
+          final AppBar appBar2 =  AppBar(
+            leading: IconButton(
+              icon: const Icon(Icons.clear),
+              iconSize: 20.0,
+              onPressed: () async {
+                //on pressing this, all messages currently selected must be de-selected and we must also revert to our original app bar
+                setState(() {
+                  selected = 0;
+                });
+                for (int i = 0; i < list.length; i++) {
+                  if (CustomMessage.fromJson(list[i].data()).isSelected) {
+                    await DatabaseService(uid: widget.userData1.uid, uid2: widget.userData2['uid']).updateMessage(CustomMessage.fromJson(list[i].data()), CustomMessage.fromJson(list[i].data()).read, false);
+                  }
+                }
+              },
             ),
+            title: Text('$selected'),
+            actions: [
+              IconButton(
+                onPressed: () async {
+                  showDialog(context: context, builder: (context) {
+                    return AlertDialog(
+                      title: Text('Do you want to delete $selected messages?'),
+                      actions: [
+                        TextButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          child: const Text('Cancel'),
+                        ),
+                        TextButton(
+                          onPressed: () async {
+                            setState(() {
+                              selected = 0;
+                            });
+                            for (int i = 0; i < list.length; i++) {
+                              if (CustomMessage.fromJson(list[i].data()).isSelected) {
+                                if (CustomMessage.fromJson(list[i].data()).image != '') {
+                                  await DatabaseService(uid: widget.userData1.uid, uid2: widget.userData2['uid']).deleteImage(CustomMessage.fromJson(list[i].data()));
+                                }
+                                else {
+                                  await DatabaseService(uid: widget.userData1.uid, uid2: widget.userData2['uid']).deleteMessage(CustomMessage.fromJson(list[i].data()));
+                                }
+                              }
+                            }
+                            Navigator.pop(context);
+                          },
+                          child: const Text('Delete'),
+                        )
+                      ],
+                    );
+                  });
+                },
+                icon: const Icon(Icons.delete),
+                iconSize: 20.0,
+              ),
+              IconButton(
+                onPressed: () {},
+                iconSize: 20.0,
+                icon: const Icon(Icons.more_vert),
+              )
+            ],
+          );
+
+          final AppBar appBar1 = AppBar(
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back),
+              iconSize: 20.0,
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+            title: Text(
+              widget.userData2['name'],
+            ),
+            actions: [
+              IconButton(
+                onPressed: () {},
+                iconSize: 20.0,
+                icon: const Icon(Icons.more_vert),
+              )
+            ],
+          );
+
+          return Scaffold(
+            backgroundColor: Colors.white,
+            appBar: selected > 0 ? appBar2 : appBar1,
             body: Stack(
               children: [
                 Container(
@@ -80,13 +164,13 @@ class _ChatRoomState extends State<ChatRoom> {
                     controller: _scrollController,
                     shrinkWrap: true,
                     scrollDirection: Axis.vertical,
-                    itemCount: list?.length,
+                    itemCount: list.length,
                     itemBuilder: (context, index) {
                       if (isReverse) {
-                        return MessageCard(userData1: widget.userData1, userData2: widget.userData2, message: CustomMessage.fromJson(list![list.length - index - 1].data()));
+                        return MessageCard(userData1: widget.userData1, userData2: widget.userData2, message: CustomMessage.fromJson(list[list.length - index - 1].data()), selected: selected);
                       }
                       else {
-                        return MessageCard(userData1: widget.userData1, userData2: widget.userData2, message: CustomMessage.fromJson(list![index].data()));
+                        return MessageCard(userData1: widget.userData1, userData2: widget.userData2, message: CustomMessage.fromJson(list[index].data()), selected: selected);
                       }
                     },
                   ),

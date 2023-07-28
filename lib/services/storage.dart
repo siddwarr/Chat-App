@@ -57,9 +57,8 @@ class StorageService {
     print('Image URL: $imageUrl');
   }
 
-  Future deleteFile() async {
-    String fileName = uid;
-    Reference reference = FirebaseStorage.instance.ref('profile_pics').child(fileName);
+  Future deleteFile(String folder, String fileName) async {
+    Reference reference = FirebaseStorage.instance.ref(folder).child(fileName);
     try {
       await reference.delete();
     }
