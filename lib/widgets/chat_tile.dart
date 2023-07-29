@@ -136,6 +136,10 @@ class _ChatTileState extends State<ChatTile> {
                       ],
                     )
                     :
+                    lastMessage.length > 35
+                    ?
+                    Text('${lastMessage.substring(0, 35)}...')
+                    :
                     Text(lastMessage),
 
                     const Spacer(),

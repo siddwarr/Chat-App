@@ -26,7 +26,7 @@ class _ChatRoomState extends State<ChatRoom> {
   final TextEditingController _controller = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   late DateTime time;
-  bool isReverse = true;
+  bool isReverse = true, deleteForEveryone = true;
   int selected = 0;
 
   Future getImageFromCamera() async {
@@ -60,10 +60,15 @@ class _ChatRoomState extends State<ChatRoom> {
           final list = snapshot.data?.docs;
 
           selected = 0;
+          deleteForEveryone = true;
 
           //iterating through the messages to find the number of messages selected
           for (int i = 0; i < list!.length; i++) {
             if (CustomMessage.fromJson(list[i].data()).isSelected) {
+              //check if the selected message was sent by the other party
+              if (CustomMessage.fromJson(list[i].data()).fromID != widget.userData1.uid) {
+                deleteForEveryone = false;
+              }
               selected++;
             }
           }
@@ -92,6 +97,8 @@ class _ChatRoomState extends State<ChatRoom> {
                     return AlertDialog(
                       title: Text('Do you want to delete $selected messages?'),
                       actions: [
+                        deleteForEveryone
+                        ?
                         TextButton(
                           onPressed: () async {
                             setState(() {
@@ -110,7 +117,9 @@ class _ChatRoomState extends State<ChatRoom> {
                             Navigator.pop(context);
                           },
                           child: const Text('Delete for everyone'),
-                        ),
+                        )
+                        :
+                        const SizedBox.shrink(),
                         TextButton(
                           onPressed: () async {
                             setState(() {
