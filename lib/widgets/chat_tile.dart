@@ -73,8 +73,8 @@ class _ChatTileState extends State<ChatTile> {
                 leading: CircleAvatar(
                   radius: 20.0,
                   backgroundImage: widget.userData2['image'] != ''
-                      ? maleAvatars.contains(widget.userData2['image']) || femaleAvatars.contains(widget.userData2['image']) ? AssetImage(widget.userData2['image'].toString()) : Image.file(File(widget.userData2['image'])).image
-                      : const AssetImage('assets/avatar.png'),
+                  ? maleAvatars.contains(widget.userData2['image']) || femaleAvatars.contains(widget.userData2['image']) ? AssetImage(widget.userData2['image'].toString()) : Image.file(File(widget.userData2['image'])).image
+                  : const AssetImage('assets/avatar.png'),
                 ),
                 title: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,

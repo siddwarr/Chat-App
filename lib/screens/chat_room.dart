@@ -29,26 +29,27 @@ class _ChatRoomState extends State<ChatRoom> {
   bool isReverse = true, deleteForEveryone = true;
   int selected = 0;
 
-  Future getImageFromCamera() async {
-    final pickedFile = await picker.pickImage(source: ImageSource.camera);
+  List maleAvatars = ['assets/male_avatars/male1.jpg', 'assets/male_avatars/male2.jpg', 'assets/male_avatars/male3.jpg', 'assets/male_avatars/male4.jpg', 'assets/male_avatars/male5.jpg', 'assets/male_avatars/male6.jpg', 'assets/male_avatars/male7.jpg'];
+  List femaleAvatars = ['assets/female_avatars/female1.jpg', 'assets/female_avatars/female2.jpg', 'assets/female_avatars/female3.jpg', 'assets/female_avatars/female4.jpg', 'assets/female_avatars/female5.jpg', 'assets/female_avatars/female6.jpg', 'assets/female_avatars/female7.jpg'];
 
-    setState(() {
+  @override
+  Widget build(BuildContext context) {
+
+    Future getImageFromCamera() async {
+      final pickedFile = await picker.pickImage(source: ImageSource.camera);
       if (pickedFile != null) {
         _image = File(pickedFile.path);
         //if the user has selected a picture, we push a screen that displays the image to be sent along with a text field to type in a message along with the image, and finally the send button
+        setState(() {
+          //isReverse = false;
+          _scrollController.animateTo(_scrollController.position.minScrollExtent, duration: const Duration(milliseconds: 300), curve: Curves.easeIn);
+          _controller.clear();
+        });
         Navigator.of(context).push(MaterialPageRoute(builder: (context) => SendImage(image: _image, userData1: widget.userData1, userData2: widget.userData2)));
       }
       else {
         print('No image selected.');
       }
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-
-    if (_scrollController.hasClients) {
-      _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
     }
 
     return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
@@ -84,13 +85,30 @@ class _ChatRoomState extends State<ChatRoom> {
                 });
                 for (int i = 0; i < list.length; i++) {
                   if (CustomMessage.fromJson(list[i].data()).isSelected) {
-                    await DatabaseService(uid: widget.userData1.uid, uid2: widget.userData2['uid']).updateMessage(CustomMessage.fromJson(list[i].data()), CustomMessage.fromJson(list[i].data()).read, false, CustomMessage.fromJson(list[i].data()).visibleTo);
+                    DatabaseService(uid: widget.userData1.uid, uid2: widget.userData2['uid']).updateMessage(CustomMessage.fromJson(list[i].data()), CustomMessage.fromJson(list[i].data()).read, false, CustomMessage.fromJson(list[i].data()).visibleTo);
                   }
                 }
               },
             ),
             title: Text('$selected'),
             actions: [
+              selected == 1
+              ?
+              GestureDetector(
+                onTap: () {
+
+                },
+                child: Container(
+                  padding: const EdgeInsets.only(top: 5),
+                  //height: 20,
+                  width: 20,
+                  child: Image.asset('assets/reply.png', color: Colors.white),
+                ),
+              )
+              :
+              const SizedBox.shrink(),
+              
+              
               IconButton(
                 onPressed: () async {
                   showDialog(context: context, builder: (context) {
@@ -147,6 +165,17 @@ class _ChatRoomState extends State<ChatRoom> {
                 icon: const Icon(Icons.delete),
                 iconSize: 20.0,
               ),
+
+              GestureDetector(
+                onTap: () {},
+                child: Container(
+                  padding: const EdgeInsets.only(top: 5),
+                  //height: 20,
+                  width: 20,
+                  child: Image.asset('assets/forward.png', color: Colors.white),
+                ),
+              ),
+
               IconButton(
                 onPressed: () {},
                 iconSize: 20.0,
@@ -156,15 +185,40 @@ class _ChatRoomState extends State<ChatRoom> {
           );
 
           final AppBar appBar1 = AppBar(
-            leading: IconButton(
-              icon: const Icon(Icons.arrow_back),
-              iconSize: 20.0,
-              onPressed: () {
-                Navigator.pop(context);
-              },
-            ),
-            title: Text(
-              widget.userData2['name'],
+            flexibleSpace: SafeArea(
+              child: Container(
+                margin: const EdgeInsets.only(left: 45, top: 8),
+                child: Row(
+                  children: [
+                    // IconButton(
+                    //   icon: const Icon(Icons.arrow_back),
+                    //   iconSize: 20.0,
+                    //   onPressed: () {
+                    //     Navigator.pop(context);
+                    //   },
+                    // ),
+                    const SizedBox(
+                      width: 2,
+                    ),
+                    CircleAvatar(
+                      radius: 20.0,
+                      backgroundImage: widget.userData2['image'] != ''
+                      ? maleAvatars.contains(widget.userData2['image']) || femaleAvatars.contains(widget.userData2['image']) ? AssetImage(widget.userData2['image'].toString()) : Image.file(File(widget.userData2['image'])).image
+                      : const AssetImage('assets/avatar.png'),
+                    ),
+                    const SizedBox(
+                      width: 10,
+                    ),
+                    Text(
+                      widget.userData2['name'],
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 16.0,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
             actions: [
               IconButton(
@@ -189,21 +243,11 @@ class _ChatRoomState extends State<ChatRoom> {
                     scrollDirection: Axis.vertical,
                     itemCount: list.length,
                     itemBuilder: (context, index) {
-                      if (isReverse) {
-                        if (CustomMessage.fromJson(list[list.length - index - 1].data()).visibleTo.contains(widget.userData1.uid)) {
-                          return MessageCard(userData1: widget.userData1, userData2: widget.userData2, message: CustomMessage.fromJson(list[list.length - index - 1].data()), selected: selected);
-                        }
-                        else {
-                          return const SizedBox.shrink();
-                        }
+                      if (CustomMessage.fromJson(list[list.length - index - 1].data()).visibleTo.contains(widget.userData1.uid)) {
+                        return MessageCard(userData1: widget.userData1, userData2: widget.userData2, message: CustomMessage.fromJson(list[list.length - index - 1].data()), selected: selected);
                       }
                       else {
-                        if (CustomMessage.fromJson(list[index].data()).visibleTo.contains(widget.userData1.uid)) {
-                          return MessageCard(userData1: widget.userData1, userData2: widget.userData2, message: CustomMessage.fromJson(list[index].data()), selected: selected);
-                        }
-                        else {
-                          return const SizedBox.shrink();
-                        }
+                        return const SizedBox.shrink();
                       }
                     },
                   ),
@@ -244,8 +288,8 @@ class _ChatRoomState extends State<ChatRoom> {
                             await DatabaseService(uid: widget.userData1.uid, uid2: widget.userData2['uid']).sendMessage(_controller.text, time, '', '');
 
                             setState(() {
-                              isReverse = false;
-                              _scrollController.animateTo(_scrollController.position.maxScrollExtent, duration: const Duration(milliseconds: 300), curve: Curves.easeIn);
+                              //isReverse = false;
+                              _scrollController.animateTo(_scrollController.position.minScrollExtent, duration: const Duration(milliseconds: 300), curve: Curves.easeIn);
                               _controller.clear();
                             });
                           },
