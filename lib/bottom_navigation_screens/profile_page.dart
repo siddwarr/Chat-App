@@ -232,7 +232,7 @@ class _ProfileState extends State<Profile> {
                   ),
                   //logout button
                   SizedBox(
-                    width: 110.0,
+                    width: 125,
                     child: ElevatedButton(
                       onPressed: () async {
                         await _authService.signOut();

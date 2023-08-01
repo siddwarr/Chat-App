@@ -146,7 +146,8 @@ class _UpdateProfilePicState extends State<UpdateProfilePic> {
                           _image = File('');
                         });
                         //delete the user's current profile pic and set imagePath of current user to ''
-                        await StorageService(uid: widget.userData!.uid, image: _image).deleteFile('profile_pics', widget.userData!.uid);
+                        StorageService(uid: widget.userData!.uid, image: _image).deleteFile('profile_pics', widget.userData!.uid);
+                        DatabaseService(uid: widget.userData!.uid).updateUserData(widget.userData!.email, widget.userData!.password, widget.userData!.name, widget.userData!.username, '');
                         Navigator.pop(context);
                       },
                       child: const Text('No profile photo', textAlign: TextAlign.center),
@@ -165,12 +166,12 @@ class _UpdateProfilePicState extends State<UpdateProfilePic> {
               if (isAvatar) {
                 ByteData imageBytes = await rootBundle.load(avatar);
                 Uint8List imageData = imageBytes.buffer.asUint8List(imageBytes.offsetInBytes, imageBytes.lengthInBytes);
-                await StorageService(uid: widget.userData!.uid, image: _image).uploadAsset(imageData);
+                StorageService(uid: widget.userData!.uid, image: _image).uploadAsset(imageData);
               }
               else {
-                await StorageService(uid: widget.userData!.uid, image: _image).uploadProfilePic(widget.userData!.uid, 'profile_pics');
+                StorageService(uid: widget.userData!.uid, image: _image).uploadProfilePic(widget.userData!.uid, 'profile_pics');
               }
-              await DatabaseService(uid: widget.userData!.uid).updateUserData(widget.userData!.email, widget.userData!.password, widget.userData!.name, widget.userData!.username, _image!.path);
+              DatabaseService(uid: widget.userData!.uid).updateUserData(widget.userData!.email, widget.userData!.password, widget.userData!.name, widget.userData!.username, _image!.path);
               Navigator.pop(context); //popping the bottom sheet
             },
             child: const Text("Confirm"),

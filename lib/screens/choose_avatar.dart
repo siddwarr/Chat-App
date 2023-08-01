@@ -29,73 +29,68 @@ class _ChooseAvatarState extends State<ChooseAvatar> {
       appBar: AppBar(
         title: const Text('Choose Avatar'),
       ),
-      body: Column(
+      body: Stack(
         children: [
-          SingleChildScrollView(
-            physics: const AlwaysScrollableScrollPhysics(),
-            scrollDirection: Axis.vertical,
-            child: Container(
-              height: 590,
-              padding: const EdgeInsets.fromLTRB(45, 20, 45, 5),
-              child: ListView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                scrollDirection: Axis.vertical,
-                shrinkWrap: true,
-                children: [
-                  for (int i = 0; i < 7; i++)
-                  Column(
-                    children: [
-                      Row(
-                        children: [
-                          GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                if (!('assets/${maleAvatars[i]}' != selectedAvatar && isSelected)) {
-                                  isSelected = !isSelected;
-                                }
-                                selectedAvatar = 'assets/${maleAvatars[i]}';
-                              });
-                            },
+          Container(
+            //height: 590,
+            padding: const EdgeInsets.fromLTRB(32, 20, 32, 40),
+            child: ListView(
+              scrollDirection: Axis.vertical,
+              shrinkWrap: true,
+              children: [
+                for (int i = 0; i < 7; i++)
+                Column(
+                  children: [
+                    Row(
+                      children: [
+                        GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              if (!('assets/${maleAvatars[i]}' != selectedAvatar && isSelected)) {
+                                isSelected = !isSelected;
+                              }
+                              selectedAvatar = 'assets/${maleAvatars[i]}';
+                            });
+                          },
+                          child: CircleAvatar(
+                            radius: 60.0,
+                            backgroundColor: isHighlighted('assets/${maleAvatars[i]}', selectedAvatar) ? Colors.white : Colors.green,
                             child: CircleAvatar(
-                              radius: 60.0,
-                              backgroundColor: isHighlighted('assets/${maleAvatars[i]}', selectedAvatar) ? Colors.white : Colors.green,
-                              child: CircleAvatar(
-                                radius: 55,
-                                backgroundImage: AssetImage('assets/${maleAvatars[i]}'),
-                              ),
+                              radius: 55,
+                              backgroundImage: AssetImage('assets/${maleAvatars[i]}'),
                             ),
                           ),
-                          const SizedBox(
-                            width: 80.0,
-                          ),
-                          GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                if (!('assets/${femaleAvatars[i]}' != selectedAvatar && isSelected)) {
-                                  isSelected = !isSelected;
-                                }
-                                selectedAvatar = 'assets/${femaleAvatars[i]}';
-                              });
-                            },
+                        ),
+                        const SizedBox(
+                          width: 80.0,
+                        ),
+                        GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              if (!('assets/${femaleAvatars[i]}' != selectedAvatar && isSelected)) {
+                                isSelected = !isSelected;
+                              }
+                              selectedAvatar = 'assets/${femaleAvatars[i]}';
+                            });
+                          },
+                          child: CircleAvatar(
+                            radius: 60.0,
+                            backgroundColor: isHighlighted('assets/${femaleAvatars[i]}', selectedAvatar) ? Colors.white : Colors.green,
                             child: CircleAvatar(
-                              radius: 60.0,
-                              backgroundColor: isHighlighted('assets/${femaleAvatars[i]}', selectedAvatar) ? Colors.white : Colors.green,
-                              child: CircleAvatar(
-                                radius: 55,
-                                backgroundImage: AssetImage('assets/${femaleAvatars[i]}'),
-                              ),
+                              radius: 55,
+                              backgroundImage: AssetImage('assets/${femaleAvatars[i]}'),
                             ),
                           ),
-                        ],
-                      ),
-                      const SizedBox(
-                        height: 20.0,
-                      )
-                    ],
-                  ),
-                ]
-              )
-            ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(
+                      height: 20.0,
+                    )
+                  ],
+                ),
+              ]
+            )
           ),
           Align(
             alignment: Alignment.bottomCenter,

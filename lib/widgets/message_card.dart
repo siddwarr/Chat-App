@@ -220,7 +220,7 @@ class _MessageCardState extends State<MessageCard> {
     return Container(
       width: double.infinity,
       height: 80,
-      child: Row(
+      child: const Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [],
       ),
