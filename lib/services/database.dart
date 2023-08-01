@@ -128,7 +128,7 @@ class DatabaseService {
 
   Future<void> updateMessage(CustomMessage message, String read, bool isSelected, List<dynamic> visibleTo) async {
 
-    final CustomMessage customMessage = CustomMessage(fromID: message.fromID, toID: message.toID, message: message.message, image: message.image, type: message.type, read: read, sent: message.sent, imageReply: message.imageReply, textReply: message.textReply, isSelected: isSelected, visibleTo: visibleTo);
+    final CustomMessage customMessage = CustomMessage(fromID: message.fromID, toID: message.toID, message: message.message, image: message.image, type: message.type, read: read, sent: message.sent, replyTo: message.replyTo, imageReply: message.imageReply, textReply: message.textReply, isSelected: isSelected, visibleTo: visibleTo);
 
     //we have to convert this object to JSON before adding it to our collection 'messages'
     //each document within this collection is going to represent a particular message (the document will be named after the exact time at which that message was sent)
@@ -139,7 +139,7 @@ class DatabaseService {
     //since this is the first message that current user is sending to the other user, we must add the current user to the chat list of the other user before adding the message to the chat collection
     await addUserToChatList(uid2!, chatList, currentUser);
 
-    final CustomMessage customMessage = CustomMessage(fromID: uid, toID: uid2!, message: message, image: '', type: 'text', read: '', sent: time.millisecondsSinceEpoch.toString(), imageReply: '', textReply: '', isSelected: false, visibleTo: [uid, uid2!]);
+    final CustomMessage customMessage = CustomMessage(fromID: uid, toID: uid2!, message: message, image: '', type: 'text', read: '', sent: time.millisecondsSinceEpoch.toString(), replyTo: '', imageReply: '', textReply: '', isSelected: false, visibleTo: [uid, uid2!]);
 
     //we have to convert this object to JSON before adding it to our collection 'messages'
     //each document within this collection is going to represent a particular message (the document will be named after the exact time at which that message was sent)
@@ -150,7 +150,7 @@ class DatabaseService {
     //since this is the first message that current user is sending to the other user, we must add the current user to the chat list of the other user before adding the message to the chat collection
     await addUserToChatList(uid2!, chatList, currentUser);
 
-    final CustomMessage customMessage = CustomMessage(fromID: uid, toID: uid2!, message: '', image: image, type: 'image', read: '', sent: time.millisecondsSinceEpoch.toString(), imageReply: '', textReply: '', isSelected: false, visibleTo: [uid, uid2!]);
+    final CustomMessage customMessage = CustomMessage(fromID: uid, toID: uid2!, message: '', image: image, type: 'image', read: '', sent: time.millisecondsSinceEpoch.toString(), replyTo: '', imageReply: '', textReply: '', isSelected: false, visibleTo: [uid, uid2!]);
 
     //we have to convert this object to JSON before adding it to our collection 'messages'
     //each document within this collection is going to represent a particular message (the document will be named after the exact time at which that message was sent)
@@ -158,16 +158,16 @@ class DatabaseService {
     await StorageService(uid: uid, image: File(image)).uploadImage(time.millisecondsSinceEpoch.toString(), 'chat_images/${getConversationID(uid, uid2!)}/images');
   }
 
-  Future<void> sendMessage(String message, DateTime time, String imageReply, String textReply) async {
-    final CustomMessage customMessage = CustomMessage(fromID: uid, toID: uid2!, message: message, image: '', type: 'text', read: '', sent: time.millisecondsSinceEpoch.toString(), imageReply: imageReply, textReply: textReply, isSelected: false, visibleTo: [uid, uid2!]);
+  Future<void> sendMessage(String message, DateTime time, String replyTo, String imageReply, String textReply) async {
+    final CustomMessage customMessage = CustomMessage(fromID: uid, toID: uid2!, message: message, image: '', type: 'text', read: '', sent: time.millisecondsSinceEpoch.toString(), replyTo: replyTo, imageReply: imageReply, textReply: textReply, isSelected: false, visibleTo: [uid, uid2!]);
 
     //we have to convert this object to JSON before adding it to our collection 'messages'
     //each document within this collection is going to represent a particular message (the document will be named after the exact time at which that message was sent)
     await FirebaseFirestore.instance.collection('chat_collection/${getConversationID(uid, uid2!)}/messages').doc(time.millisecondsSinceEpoch.toString()).set(customMessage.toJson());
   }
 
-  Future<void> sendImage(String image, DateTime time, String imageReply, String textReply) async {
-    final CustomMessage customMessage = CustomMessage(fromID: uid, toID: uid2!, message: '', image: image, type: 'image', read: '', sent: time.millisecondsSinceEpoch.toString(), imageReply: imageReply, textReply: textReply, isSelected: false, visibleTo: [uid, uid2!]);
+  Future<void> sendImage(String image, DateTime time, String replyTo, String imageReply, String textReply) async {
+    final CustomMessage customMessage = CustomMessage(fromID: uid, toID: uid2!, message: '', image: image, type: 'image', read: '', sent: time.millisecondsSinceEpoch.toString(), replyTo: replyTo, imageReply: imageReply, textReply: textReply, isSelected: false, visibleTo: [uid, uid2!]);
 
     //we have to convert this object to JSON before adding it to our collection 'messages'
     //each document within this collection is going to represent a particular message (the document will be named after the exact time at which that message was sent)

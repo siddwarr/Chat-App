@@ -72,11 +72,23 @@ class _MessageCardState extends State<MessageCard> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    widget.message.imageReply != ''
+                    ?
+                    _imageReply()
+                    :
+                    widget.message.textReply != ''
+                    ?
+                    _textReply()
+                    :
+                    const SizedBox.shrink(),
+
+
                     widget.message.image == ''
                     ?
                     const SizedBox.shrink()
                     :
                     Image.file(File(widget.message.image)),
+
 
                     widget.message.message == ''
                     ?
@@ -152,6 +164,17 @@ class _MessageCardState extends State<MessageCard> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
+                    widget.message.imageReply != ''
+                        ?
+                    _imageReply()
+                        :
+                    widget.message.textReply != ''
+                        ?
+                    _textReply()
+                        :
+                    const SizedBox.shrink(),
+
+
                     widget.message.image == ''
                         ?
                     const SizedBox.shrink()
@@ -190,6 +213,23 @@ class _MessageCardState extends State<MessageCard> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _imageReply() {
+    return Container(
+      width: double.infinity,
+      height: 80,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [],
+      ),
+    );
+  }
+
+  Widget _textReply() {
+    return Container(
+
     );
   }
 }

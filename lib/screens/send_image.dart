@@ -72,7 +72,7 @@ class _SendImageState extends State<SendImage> {
                       final chatList = await DatabaseService(uid: widget.userData1.uid).obtainChatList(widget.userData2['uid']);
                       await DatabaseService(uid: widget.userData1.uid, uid2: widget.userData2['uid']).sendFirstImage(widget.userData1, chatList, widget.image!.path, time);
                       //case 2: the list is not empty
-                      await DatabaseService(uid: widget.userData1.uid, uid2: widget.userData2['uid']).sendImage(widget.image!.path, time, '', '');
+                      await DatabaseService(uid: widget.userData1.uid, uid2: widget.userData2['uid']).sendImage(widget.image!.path, time, '', '', '');
 
                     },
                     child: const Icon(Icons.send, size: 20.0),

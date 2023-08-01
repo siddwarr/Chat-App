@@ -285,7 +285,7 @@ class _ChatRoomState extends State<ChatRoom> {
                             final chatList = await DatabaseService(uid: widget.userData1.uid).obtainChatList(widget.userData2['uid']);
                             await DatabaseService(uid: widget.userData1.uid, uid2: widget.userData2['uid']).sendFirstMessage(widget.userData1, chatList, _controller.text, time);
                             //case 2: the list is not empty
-                            await DatabaseService(uid: widget.userData1.uid, uid2: widget.userData2['uid']).sendMessage(_controller.text, time, '', '');
+                            await DatabaseService(uid: widget.userData1.uid, uid2: widget.userData2['uid']).sendMessage(_controller.text, time, '', '', '');
 
                             setState(() {
                               //isReverse = false;
